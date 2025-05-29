@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import AgentCard from '@/components/AgentCard';
 import ChatInterface from '@/components/ChatInterface';
 import AutonomousAgentMonitor from '@/components/AutonomousAgentMonitor';
+import ExecutiveDashboard from '@/components/ExecutiveDashboard';
 import { 
   Brain, 
   TrendingUp, 
@@ -29,8 +29,20 @@ import { Agent } from '@/types/agent';
 const Index = () => {
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [showMonitor, setShowMonitor] = useState(false);
+  const [showExecutiveDashboard, setShowExecutiveDashboard] = useState(false);
 
   const agents: Agent[] = [
+    {
+      id: 'executive-eva',
+      name: 'Executive Eva',
+      role: 'Executive Assistant & Permission Manager',
+      description: 'Your elite personal AI executive assistant managing permissions, monitoring all agents, and ensuring you maintain complete control over critical business decisions.',
+      capabilities: ['Permission Management', 'Executive Reporting', 'Crisis Escalation', 'Multi-channel Contact', 'Security Oversight', 'Real-time Monitoring'],
+      icon: <Crown className="w-6 h-6" />,
+      color: 'from-purple-600 to-indigo-700',
+      isActive: true,
+      lastActivity: new Date()
+    },
     {
       id: 'strategy',
       name: 'Alex Strategy',
@@ -165,6 +177,14 @@ const Index = () => {
     }
   ];
 
+  const handleAgentClick = (agent: Agent) => {
+    if (agent.id === 'executive-eva') {
+      setShowExecutiveDashboard(true);
+    } else {
+      setSelectedAgent(agent);
+    }
+  };
+
   if (selectedAgent) {
     return <ChatInterface agent={selectedAgent} onBack={() => setSelectedAgent(null)} />;
   }
@@ -185,6 +205,10 @@ const Index = () => {
     );
   }
 
+  if (showExecutiveDashboard) {
+    return <ExecutiveDashboard onBack={() => setShowExecutiveDashboard(false)} />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <div className="container mx-auto px-4 py-8">
@@ -199,20 +223,20 @@ const Index = () => {
             </h1>
           </div>
           <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed mb-6">
-            Your autonomous team of 12 elite AI specialists that communicate, collaborate, and operate with advanced natural language processing, multi-channel communication, and comprehensive business management capabilities
+            Your autonomous team of 13 elite AI specialists with Executive Assistant command & control. Complete permission management, real-time monitoring, and executive oversight for secure autonomous operations.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
             <Badge className="bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-green-200 px-4 py-2 text-sm">
               <Sparkles className="w-4 h-4 mr-2" />
-              12 Elite Specialists
+              13 Elite Specialists + Executive Control
             </Badge>
             <Badge className="bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 border-blue-200 px-4 py-2 text-sm">
               <BarChart3 className="w-4 h-4 mr-2" />
-              Advanced AI Capabilities
+              Permission Management System
             </Badge>
             <Badge className="bg-gradient-to-r from-purple-100 to-violet-100 text-purple-800 border-purple-200 px-4 py-2 text-sm">
               <Shield className="w-4 h-4 mr-2" />
-              Enterprise-Grade Intelligence
+              Executive Oversight & Control
             </Badge>
             <Button onClick={() => setShowMonitor(true)} className="ml-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700" variant="default">
               <Activity className="w-4 h-4 mr-2" />
@@ -224,20 +248,20 @@ const Index = () => {
         {/* Enhanced Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
           <div className="text-center p-6 bg-gradient-to-br from-white to-blue-50 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20">
-            <div className="text-4xl font-bold text-blue-600 mb-2">12</div>
-            <div className="text-gray-600 font-medium">Elite Specialists</div>
+            <div className="text-4xl font-bold text-blue-600 mb-2">13</div>
+            <div className="text-gray-600 font-medium">Elite Specialists + Executive</div>
           </div>
           <div className="text-center p-6 bg-gradient-to-br from-white to-green-50 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20">
             <div className="text-4xl font-bold text-green-600 mb-2">24/7</div>
-            <div className="text-gray-600 font-medium">Autonomous Operation</div>
+            <div className="text-gray-600 font-medium">Controlled Operations</div>
           </div>
           <div className="text-center p-6 bg-gradient-to-br from-white to-purple-50 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20">
-            <div className="text-4xl font-bold text-purple-600 mb-2">∞</div>
-            <div className="text-gray-600 font-medium">Business Possibilities</div>
+            <div className="text-4xl font-bold text-purple-600 mb-2">🔐</div>
+            <div className="text-gray-600 font-medium">Executive Permission Control</div>
           </div>
           <div className="text-center p-6 bg-gradient-to-br from-white to-amber-50 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20">
             <div className="text-4xl font-bold text-amber-600 mb-2">🚀</div>
-            <div className="text-gray-600 font-medium">Elite Performance</div>
+            <div className="text-gray-600 font-medium">Secure Elite Performance</div>
           </div>
         </div>
 
@@ -252,24 +276,24 @@ const Index = () => {
               capabilities={agent.capabilities}
               icon={agent.icon}
               color={agent.color}
-              onClick={() => setSelectedAgent(agent)}
+              onClick={() => handleAgentClick(agent)}
             />
           ))}
         </div>
 
         {/* Enhanced Footer */}
         <div className="text-center mt-16 p-8 bg-gradient-to-r from-white/80 to-blue-50/80 backdrop-blur-sm rounded-3xl border border-white/20 shadow-xl">
-          <h3 className="text-3xl font-bold text-gray-900 mb-4">Elite Autonomous AI Business Network</h3>
+          <h3 className="text-3xl font-bold text-gray-900 mb-4">Executive-Controlled AI Business Network</h3>
           <p className="text-gray-700 mb-6 max-w-4xl mx-auto text-lg leading-relaxed">
-            These elite AI specialists operate autonomously with advanced natural language processing, multi-channel communication (email, SMS, phone), web browsing capabilities, document creation, financial modeling, coding abilities, and comprehensive business intelligence - working together 24/7 to optimize and transform your business operations
+            Your elite AI team now operates under complete executive control with "Executive Eva" managing all permissions, monitoring activities, and ensuring critical decisions reach you through your preferred communication channels. Secure, autonomous, and always under your authority.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <Badge variant="outline" className="border-blue-200 text-blue-700 px-3 py-2">Natural Language Processing</Badge>
-            <Badge variant="outline" className="border-green-200 text-green-700 px-3 py-2">Multi-Channel Communication</Badge>
-            <Badge variant="outline" className="border-purple-200 text-purple-700 px-3 py-2">Web Browsing & Research</Badge>
-            <Badge variant="outline" className="border-amber-200 text-amber-700 px-3 py-2">Document & Financial Management</Badge>
-            <Badge variant="outline" className="border-indigo-200 text-indigo-700 px-3 py-2">Coding & Automation</Badge>
-            <Badge variant="outline" className="border-rose-200 text-rose-700 px-3 py-2">Elite Business Intelligence</Badge>
+            <Badge variant="outline" className="border-purple-200 text-purple-700 px-3 py-2">Executive Permission Management</Badge>
+            <Badge variant="outline" className="border-blue-200 text-blue-700 px-3 py-2">Real-time Monitoring & Control</Badge>
+            <Badge variant="outline" className="border-green-200 text-green-700 px-3 py-2">Multi-Channel Executive Alerts</Badge>
+            <Badge variant="outline" className="border-amber-200 text-amber-700 px-3 py-2">Crisis Escalation Protocols</Badge>
+            <Badge variant="outline" className="border-indigo-200 text-indigo-700 px-3 py-2">Secure Autonomous Operations</Badge>
+            <Badge variant="outline" className="border-rose-200 text-rose-700 px-3 py-2">Complete Executive Authority</Badge>
           </div>
         </div>
       </div>

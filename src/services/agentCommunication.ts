@@ -50,8 +50,15 @@ class AgentCommunicationService {
     }, 2000);
   }
 
-  // Enhanced inter-agent messaging with NLP
+  // Enhanced inter-agent messaging with permission controls
   sendMessage(fromAgentId: string, toAgentId: string, content: string, type: AgentMessage['type'], metadata?: any) {
+    // Check if this action requires permission
+    if (this.requiresExecutivePermission('send_message', fromAgentId, { toAgentId, content, type })) {
+      return this.requestPermissionAndQueue('send_message', fromAgentId, 'Send Inter-Agent Message', 
+        `Send message to ${toAgentId}: ${content.substring(0, 100)}...`, 'medium', 
+        { action: 'sendMessage', params: [fromAgentId, toAgentId, content, type, metadata] });
+    }
+
     const message: AgentMessage = {
       id: Date.now().toString(),
       fromAgent: fromAgentId,
@@ -63,12 +70,13 @@ class AgentCommunicationService {
         ...metadata,
         processedWithNLP: true,
         sentimentAnalysis: this.analyzeSentiment(content),
-        priority: this.calculateMessagePriority(type, content)
+        priority: this.calculateMessagePriority(type, content),
+        executiveApproved: true
       }
     };
 
     this.messages.push(message);
-    console.log(`Enhanced message sent from ${fromAgentId} to ${toAgentId}: ${content}`);
+    console.log(`✅ Executive-approved message sent from ${fromAgentId} to ${toAgentId}: ${content}`);
 
     // Notify the receiving agent with advanced processing
     const listener = this.messageListeners.get(toAgentId);
@@ -126,22 +134,37 @@ class AgentCommunicationService {
     return insights;
   }
 
-  // Advanced communication capabilities
+  // Enhanced communication capabilities with permission controls
   sendEmail(agentId: string, recipient: string, subject: string, body: string) {
-    console.log(`Agent ${agentId} sending email to ${recipient}: ${subject}`);
-    // Simulate email sending with advanced templates
+    if (this.requiresExecutivePermission('send_email', agentId, { recipient, subject })) {
+      return this.requestPermissionAndQueue('send_email', agentId, 'Send Email', 
+        `Send email to ${recipient}: ${subject}`, 'high',
+        { action: 'sendEmail', params: [agentId, recipient, subject, body] });
+    }
+
+    console.log(`✅ Executive-approved: Agent ${agentId} sending email to ${recipient}: ${subject}`);
     return this.simulateEmailDelivery(agentId, recipient, subject, body);
   }
 
   sendSMS(agentId: string, phoneNumber: string, message: string) {
-    console.log(`Agent ${agentId} sending SMS to ${phoneNumber}: ${message}`);
-    // Simulate SMS sending with delivery confirmation
+    if (this.requiresExecutivePermission('send_sms', agentId, { phoneNumber, message })) {
+      return this.requestPermissionAndQueue('send_sms', agentId, 'Send SMS', 
+        `Send SMS to ${phoneNumber}: ${message.substring(0, 50)}...`, 'medium',
+        { action: 'sendSMS', params: [agentId, phoneNumber, message] });
+    }
+
+    console.log(`✅ Executive-approved: Agent ${agentId} sending SMS to ${phoneNumber}: ${message}`);
     return this.simulateSMSDelivery(agentId, phoneNumber, message);
   }
 
   initiatePhoneCall(agentId: string, phoneNumber: string, purpose: string) {
-    console.log(`Agent ${agentId} initiating call to ${phoneNumber} for: ${purpose}`);
-    // Simulate AI-powered phone call
+    if (this.requiresExecutivePermission('make_phone_call', agentId, { phoneNumber, purpose })) {
+      return this.requestPermissionAndQueue('make_phone_call', agentId, 'Initiate Phone Call', 
+        `Call ${phoneNumber} for: ${purpose}`, 'high',
+        { action: 'initiatePhoneCall', params: [agentId, phoneNumber, purpose] });
+    }
+
+    console.log(`✅ Executive-approved: Agent ${agentId} initiating call to ${phoneNumber} for: ${purpose}`);
     return this.simulatePhoneCall(agentId, phoneNumber, purpose);
   }
 
@@ -153,8 +176,15 @@ class AgentCommunicationService {
   }
 
   generateFinancialModel(agentId: string, modelType: string, parameters: any) {
-    console.log(`Agent ${agentId} creating ${modelType} financial model`);
-    // Simulate financial modeling with AI
+    const amount = parameters?.budgetImpact || 0;
+    if (this.requiresExecutivePermission('financial_transaction', agentId, { amount, modelType })) {
+      return this.requestPermissionAndQueue('financial_transaction', agentId, 'Generate Financial Model', 
+        `Create ${modelType} financial model with ${amount > 0 ? `$${amount} budget impact` : 'analysis'}`, 
+        amount > 10000 ? 'critical' : 'high',
+        { action: 'generateFinancialModel', params: [agentId, modelType, parameters] });
+    }
+
+    console.log(`✅ Executive-approved: Agent ${agentId} creating ${modelType} financial model`);
     return this.simulateFinancialModeling(agentId, modelType, parameters);
   }
 
@@ -330,6 +360,64 @@ class AgentCommunicationService {
       features: ['Error handling', 'Documentation', 'Testing', 'Optimization'],
       repository: `/generated-code/${language}_${Date.now()}`
     };
+  }
+
+  // Permission checking system
+  private requiresExecutivePermission(action: string, agentId: string, metadata?: any): boolean {
+    // Import permission service dynamically to avoid circular dependencies
+    const { permissionService } = require('./permissionService');
+    return permissionService.requiresPermission(action, agentId, metadata);
+  }
+
+  // Request permission and queue action
+  private requestPermissionAndQueue(
+    action: string, 
+    agentId: string, 
+    actionTitle: string,
+    description: string, 
+    priority: 'low' | 'medium' | 'high' | 'critical',
+    queuedAction: any
+  ) {
+    const { permissionService } = require('./permissionService');
+    const agentName = this.getAgentDisplayName(agentId);
+    
+    const request = permissionService.requestPermission(
+      agentId,
+      agentName,
+      actionTitle,
+      description,
+      priority,
+      { ...queuedAction.params, queuedAction }
+    );
+
+    console.log(`⏳ Permission requested by ${agentName}: ${actionTitle}`);
+    
+    return {
+      success: false,
+      pending: true,
+      requestId: request.id,
+      message: `Permission requested from Executive. Waiting for approval...`
+    };
+  }
+
+  // Get agent display name
+  private getAgentDisplayName(agentId: string): string {
+    const agentNames: { [key: string]: string } = {
+      'executive-eva': 'Executive Eva',
+      'strategy': 'Alex Strategy',
+      'marketing': 'Maya Creative',
+      'finance': 'Felix Finance',
+      'operations': 'Oliver Operations',
+      'customer': 'Clara Customer',
+      'hr': 'Harper HR',
+      'legal': 'Lex Legal',
+      'cto': 'Code Commander',
+      'data': 'Dr. Data',
+      'intelligence': 'Intel Investigator',
+      'communications': 'Comm Chief',
+      'documents': 'Doc Master'
+    };
+    return agentNames[agentId] || agentId;
   }
 
   // Keep existing methods unchanged
