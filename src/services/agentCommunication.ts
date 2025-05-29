@@ -12,6 +12,8 @@ interface AdvancedCapabilities {
   emailIntegration: boolean;
   smsIntegration: boolean;
   phoneIntegration: boolean;
+  googleClassroom: boolean;
+  trelloIntegration: boolean;
 }
 
 class AgentCommunicationService {
@@ -29,7 +31,9 @@ class AgentCommunicationService {
     codingCapabilities: true,
     emailIntegration: true,
     smsIntegration: true,
-    phoneIntegration: true
+    phoneIntegration: true,
+    googleClassroom: true,
+    trelloIntegration: true
   };
 
   // Enhanced agent registration with AI personality integration
@@ -513,6 +517,110 @@ class AgentCommunicationService {
     };
   }
 
+  // Google Classroom Integration
+  async updateGoogleClassroom(agentId: string, action: string, courseId?: string, data?: any) {
+    if (this.requiresExecutivePermission('google_classroom', agentId, { action, courseId })) {
+      return this.requestPermissionAndQueue('google_classroom', agentId, 'Google Classroom Update', 
+        `${action} in Google Classroom${courseId ? ` for course ${courseId}` : ''}`, 'medium',
+        { action: 'updateGoogleClassroom', params: [agentId, action, courseId, data] });
+    }
+
+    try {
+      const { data: result, error } = await supabase.functions.invoke('google-classroom', {
+        body: {
+          agentId,
+          action,
+          courseId,
+          data
+        }
+      });
+
+      if (error) throw error;
+
+      console.log(`✅ Executive-approved: ${this.getAgentDisplayName(agentId)} performed Google Classroom action: ${action}`);
+      return result;
+    } catch (error) {
+      console.error('Failed to update Google Classroom:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  // Trello Integration
+  async updateTrelloBoard(agentId: string, action: string, boardId?: string, listId?: string, cardId?: string, data?: any) {
+    if (this.requiresExecutivePermission('trello_integration', agentId, { action, boardId })) {
+      return this.requestPermissionAndQueue('trello_integration', agentId, 'Trello Update', 
+        `${action} in Trello${boardId ? ` for board ${boardId}` : ''}`, 'medium',
+        { action: 'updateTrelloBoard', params: [agentId, action, boardId, listId, cardId, data] });
+    }
+
+    try {
+      const { data: result, error } = await supabase.functions.invoke('trello-integration', {
+        body: {
+          agentId,
+          action,
+          boardId,
+          listId,
+          cardId,
+          data
+        }
+      });
+
+      if (error) throw error;
+
+      console.log(`✅ Executive-approved: ${this.getAgentDisplayName(agentId)} performed Trello action: ${action}`);
+      return result;
+    } catch (error) {
+      console.error('Failed to update Trello board:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  // Enhanced nonprofit-specific methods
+  async createGrantTrackingBoard(agentId: string, grantName: string) {
+    const boardData = {
+      name: `Grant: ${grantName}`,
+      description: `Grant application tracking and management for ${grantName}`
+    };
+
+    const board = await this.updateTrelloBoard(agentId, 'createBoard', undefined, undefined, undefined, boardData);
+    
+    if (board.success) {
+      // Create standard grant tracking lists
+      const lists = [
+        'Research & Planning',
+        'Application Draft',
+        'Review & Revision',
+        'Submitted',
+        'Follow-up Required',
+        'Approved',
+        'Reporting'
+      ];
+
+      for (const listName of lists) {
+        await this.updateTrelloBoard(agentId, 'createList', board.data.id, undefined, undefined, { name: listName });
+      }
+    }
+
+    return board;
+  }
+
+  async createEducationalCourse(agentId: string, courseName: string, description: string) {
+    const courseData = {
+      name: courseName,
+      description: description
+    };
+
+    return await this.updateGoogleClassroom(agentId, 'createCourse', undefined, courseData);
+  }
+
+  async postGrantUpdateAnnouncement(agentId: string, courseId: string, grantStatus: string, details: string) {
+    const announcementData = {
+      text: `Grant Update: ${grantStatus}\n\n${details}\n\nPosted by AI Agent: ${this.getAgentDisplayName(agentId)}`
+    };
+
+    return await this.updateGoogleClassroom(agentId, 'postAnnouncement', courseId, announcementData);
+  }
+
   private getAgentDisplayName(agentId: string): string {
     const agentNames: { [key: string]: string } = {
       'executive-eva': 'Executive Eva',
@@ -527,7 +635,12 @@ class AgentCommunicationService {
       'data': 'Dr. Data',
       'intelligence': 'Intel Investigator',
       'communications': 'Comm Chief',
-      'documents': 'Doc Master'
+      'documents': 'Doc Master',
+      'grant-expert': 'Dr. Grant Sterling',
+      'government-contracts': 'Agent Samuel Contracts',
+      'chief-strategy': 'Victoria Sterling',
+      'negotiation-expert': 'Marcus Dealmaker',
+      'digital-fundraising': 'Diana Digital'
     };
     return agentNames[agentId] || agentId;
   }
