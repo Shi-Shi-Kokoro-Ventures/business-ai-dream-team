@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { AgentContactsList } from '@/components/AgentContactsList';
 import { IOSMessageInterface } from '@/components/iOSMessageInterface';
@@ -50,11 +51,14 @@ export const AgentContacts: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>(mockMessages);
 
   const handleSelectAgent = (agentId: string) => {
+    console.log('Selecting agent:', agentId);
     setSelectedAgent(agentId);
     // Load messages for selected agent
   };
 
   const handleSendMessage = (message: string) => {
+    console.log('Sending message:', message);
+    
     const newMessage: Message = {
       id: Date.now().toString(),
       content: message,
@@ -79,6 +83,7 @@ export const AgentContacts: React.FC = () => {
   };
 
   const handleBack = () => {
+    console.log('Going back to contacts list');
     setSelectedAgent(null);
   };
 

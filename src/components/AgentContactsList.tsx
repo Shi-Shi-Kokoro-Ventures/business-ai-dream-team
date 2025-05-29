@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Search, Users, Star } from 'lucide-react';
 import { Input } from '@/components/ui/input';
