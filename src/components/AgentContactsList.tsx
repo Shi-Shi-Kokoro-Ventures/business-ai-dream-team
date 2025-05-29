@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Search, Users, Star } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -74,7 +73,11 @@ const agents = [
   }
 ];
 
-export const AgentContactsList: React.FC = () => {
+interface AgentContactsListProps {
+  onSelectAgent?: (agentId: string) => void;
+}
+
+export const AgentContactsList: React.FC<AgentContactsListProps> = ({ onSelectAgent }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTab, setSelectedTab] = useState('all');
 
@@ -92,7 +95,9 @@ export const AgentContactsList: React.FC = () => {
 
   const handleMessage = (agentId: string) => {
     console.log(`Opening message thread with ${agentId}`);
-    // Implementation for opening message interface
+    if (onSelectAgent) {
+      onSelectAgent(agentId);
+    }
   };
 
   const handleCall = (agentId: string) => {

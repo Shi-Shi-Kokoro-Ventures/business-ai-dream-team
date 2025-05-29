@@ -37,9 +37,18 @@ const mockAgent = {
   isTyping: false
 };
 
+// Define proper message type
+interface Message {
+  id: string;
+  content: string;
+  sender: 'user' | 'agent';
+  timestamp: Date;
+  status: 'sending' | 'sent' | 'delivered' | 'read';
+}
+
 export const AgentContacts: React.FC = () => {
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
-  const [messages, setMessages] = useState(mockMessages);
+  const [messages, setMessages] = useState<Message[]>(mockMessages);
 
   const handleSelectAgent = (agentId: string) => {
     setSelectedAgent(agentId);
@@ -47,24 +56,24 @@ export const AgentContacts: React.FC = () => {
   };
 
   const handleSendMessage = (message: string) => {
-    const newMessage = {
+    const newMessage: Message = {
       id: Date.now().toString(),
       content: message,
-      sender: 'user' as const,
+      sender: 'user',
       timestamp: new Date(),
-      status: 'sent' as const
+      status: 'sent'
     };
     
     setMessages(prev => [...prev, newMessage]);
     
     // Simulate agent response
     setTimeout(() => {
-      const agentResponse = {
+      const agentResponse: Message = {
         id: (Date.now() + 1).toString(),
         content: "I understand! I'm working on that right now and will coordinate with the team. I'll update you shortly.",
-        sender: 'agent' as const,
+        sender: 'agent',
         timestamp: new Date(),
-        status: 'read' as const
+        status: 'read'
       };
       setMessages(prev => [...prev, agentResponse]);
     }, 2000);
@@ -85,5 +94,5 @@ export const AgentContacts: React.FC = () => {
     );
   }
 
-  return <AgentContactsList />;
+  return <AgentContactsList onSelectAgent={handleSelectAgent} />;
 };
