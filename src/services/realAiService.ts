@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 interface ConversationMessage {
@@ -33,7 +34,6 @@ class RealAIService {
   }
 
   private initializePersonalities() {
-    // ... keep existing code (personality initialization from aiService.ts)
     const personalities: AgentPersonality[] = [
       {
         name: 'Executive Eva',
