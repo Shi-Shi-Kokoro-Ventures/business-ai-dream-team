@@ -1,40 +1,60 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Send, Bot, User, Sparkles } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ArrowLeft, Send, Brain, Sparkles, Zap, Bot, MessageSquare, Activity } from 'lucide-react';
+import { Agent } from '@/types/agent';
+import { aiService } from '@/services/aiService';
+
+interface ChatInterfaceProps {
+  agent: Agent;
+  onBack: () => void;
+}
 
 interface Message {
   id: string;
   content: string;
   sender: 'user' | 'agent';
   timestamp: Date;
-}
-
-interface ChatInterfaceProps {
-  agent: {
-    name: string;
-    role: string;
-    color: string;
-    icon: React.ReactNode;
-  };
-  onBack: () => void;
+  type?: 'thinking' | 'normal';
 }
 
 const ChatInterface = ({ agent, onBack }: ChatInterfaceProps) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      content: `Hello! I'm ${agent.name}, your ${agent.role}. I'm here to help you with your business needs. What would you like to discuss today?`,
-      sender: 'agent',
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  useEffect(() => {
+    // Send initial greeting when chat opens
+    const sendInitialGreeting = async () => {
+      setIsTyping(true);
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate thinking time
+      
+      const greeting = await aiService.processMessage(agent.id, "Hello! I'm ready to assist you.");
+      
+      const initialMessage: Message = {
+        id: Date.now().toString(),
+        content: greeting,
+        sender: 'agent',
+        timestamp: new Date()
+      };
+      
+      setMessages([initialMessage]);
+      setIsTyping(false);
+    };
+
+    sendInitialGreeting();
+  }, [agent.id]);
 
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
@@ -50,151 +70,186 @@ const ChatInterface = ({ agent, onBack }: ChatInterfaceProps) => {
     setInputValue('');
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const agentResponse: Message = {
+    // Simulate AI thinking time
+    const thinkingTime = Math.random() * 2000 + 500; // 0.5-2.5 seconds
+    await new Promise(resolve => setTimeout(resolve, thinkingTime));
+
+    try {
+      const response = await aiService.processMessage(agent.id, userMessage.content, {
+        previousMessages: messages.slice(-5), // Provide recent context
+        agentCapabilities: agent.capabilities
+      });
+
+      const agentMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: getAgentResponse(inputValue, agent.role),
+        content: response,
         sender: 'agent',
         timestamp: new Date()
       };
-      setMessages(prev => [...prev, agentResponse]);
-      setIsTyping(false);
-    }, 1500);
+
+      setMessages(prev => [...prev, agentMessage]);
+    } catch (error) {
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: "I apologize, but I'm experiencing some technical difficulties. Please try again in a moment.",
+        sender: 'agent',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    }
+
+    setIsTyping(false);
   };
 
-  const getAgentResponse = (userInput: string, role: string): string => {
-    const responses = {
-      'Strategic Planning & Analytics Expert': [
-        "Let me analyze your business metrics and provide strategic insights...",
-        "Based on market trends, I recommend focusing on these key areas...",
-        "Here's a comprehensive analysis of your competitive position..."
-      ],
-      'Marketing & Content Specialist': [
-        "I can help you create compelling marketing campaigns...",
-        "Let's develop a content strategy that resonates with your audience...",
-        "Here are some innovative marketing ideas for your business..."
-      ],
-      'Financial Management Advisor': [
-        "Let me review your financial data and provide recommendations...",
-        "I'll help you optimize your budget and cash flow...",
-        "Here's a detailed financial analysis and forecast..."
-      ],
-      'Operations & Productivity Manager': [
-        "I can help streamline your business processes...",
-        "Let's identify bottlenecks and optimization opportunities...",
-        "Here are some automation solutions for your operations..."
-      ],
-      'Customer Relations Specialist': [
-        "I'll help you enhance customer satisfaction and retention...",
-        "Let's develop a comprehensive customer service strategy...",
-        "Here are insights from your customer feedback analysis..."
-      ],
-      'HR & Team Development Coach': [
-        "I can assist with team building and development strategies...",
-        "Let's work on improving team productivity and morale...",
-        "Here are some recommendations for talent management..."
-      ]
-    };
-
-    const roleResponses = responses[role as keyof typeof responses] || [
-      "I'm here to help with your business needs. How can I assist you today?"
-    ];
-    
-    return roleResponses[Math.floor(Math.random() * roleResponses.length)];
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
   };
+
+  const personality = aiService.getAgentPersonality(agent.id);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <div className="container mx-auto px-4 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Header */}
         <div className="flex items-center gap-4 mb-6">
-          <Button variant="ghost" onClick={onBack} className="hover:bg-gray-100">
+          <Button onClick={onBack} variant="outline" size="sm">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
           </Button>
-          <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg bg-gradient-to-br ${agent.color} text-white`}>
-              {agent.icon}
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">{agent.name}</h1>
-              <p className="text-sm text-gray-600">{agent.role}</p>
-            </div>
-            <Badge className="bg-green-100 text-green-700 border-green-200">
-              <Sparkles className="w-3 h-3 mr-1" />
-              Online
+          <div className={`p-3 rounded-xl bg-gradient-to-br ${agent.color} text-white shadow-lg`}>
+            {agent.icon}
+          </div>
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold text-gray-900">{agent.name}</h1>
+            <p className="text-gray-600">{agent.role}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge className="bg-green-100 text-green-800 border-green-200">
+              <Activity className="w-3 h-3 mr-1" />
+              AI Active
+            </Badge>
+            <Badge className="bg-purple-100 text-purple-800 border-purple-200">
+              <Brain className="w-3 h-3 mr-1" />
+              Intelligent
             </Badge>
           </div>
         </div>
 
-        <Card className="h-[600px] flex flex-col border-0 shadow-xl bg-white/80 backdrop-blur-sm">
-          <ScrollArea className="flex-1 p-6">
-            <div className="space-y-4">
+        {/* Agent Personality Card */}
+        {personality && (
+          <Card className="mb-6 p-4 bg-gradient-to-r from-white/90 to-blue-50/90 border-0 shadow-lg">
+            <div className="flex items-start gap-3">
+              <Sparkles className="w-5 h-5 text-purple-500 mt-1" />
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">AI Personality Profile</h3>
+                <p className="text-sm text-gray-700 mb-2"><strong>Personality:</strong> {personality.personality}</p>
+                <p className="text-sm text-gray-700 mb-2"><strong>Communication Style:</strong> {personality.communicationStyle}</p>
+                <div className="flex flex-wrap gap-1">
+                  {personality.expertise.map((skill, index) => (
+                    <Badge key={index} variant="secondary" className="text-xs">
+                      {skill}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {/* Chat Messages */}
+        <Card className="mb-6 h-96 overflow-hidden">
+          <div className="h-full flex flex-col">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex gap-3 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                  className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  {message.sender === 'agent' && (
-                    <div className={`p-2 rounded-full bg-gradient-to-br ${agent.color} text-white shadow-md`}>
-                      <Bot className="w-4 h-4" />
-                    </div>
-                  )}
                   <div
-                    className={`max-w-[80%] p-4 rounded-2xl shadow-sm ${
+                    className={`max-w-[80%] rounded-2xl p-4 ${
                       message.sender === 'user'
                         ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
-                        : 'bg-gray-50 text-gray-900 border border-gray-100'
+                        : `bg-gradient-to-r ${agent.color} text-white`
                     }`}
                   >
-                    <p className="text-sm leading-relaxed">{message.content}</p>
-                    <p className={`text-xs mt-2 opacity-70 ${
-                      message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
-                    }`}>
-                      {message.timestamp.toLocaleTimeString()}
-                    </p>
-                  </div>
-                  {message.sender === 'user' && (
-                    <div className="p-2 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md">
-                      <User className="w-4 h-4" />
+                    <div className="flex items-start gap-2">
+                      {message.sender === 'agent' && (
+                        <Bot className="w-4 h-4 mt-1 opacity-80" />
+                      )}
+                      <div className="flex-1">
+                        <p className="text-sm">{message.content}</p>
+                        <p className="text-xs opacity-75 mt-2">
+                          {message.timestamp.toLocaleTimeString()}
+                        </p>
+                      </div>
                     </div>
-                  )}
+                  </div>
                 </div>
               ))}
+              
               {isTyping && (
-                <div className="flex gap-3 justify-start">
-                  <div className={`p-2 rounded-full bg-gradient-to-br ${agent.color} text-white shadow-md`}>
-                    <Bot className="w-4 h-4" />
-                  </div>
-                  <div className="bg-gray-50 text-gray-900 border border-gray-100 p-4 rounded-2xl shadow-sm">
-                    <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                <div className="flex justify-start">
+                  <div className={`bg-gradient-to-r ${agent.color} text-white rounded-2xl p-4`}>
+                    <div className="flex items-center gap-2">
+                      <Brain className="w-4 h-4 animate-pulse" />
+                      <div className="flex gap-1">
+                        <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                        <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      </div>
+                      <span className="text-sm opacity-80">Thinking...</span>
                     </div>
                   </div>
                 </div>
               )}
+              
+              <div ref={messagesEndRef} />
             </div>
-          </ScrollArea>
-          
-          <div className="p-6 border-t bg-white/50">
-            <div className="flex gap-3">
-              <Input
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Type your message..."
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                className="flex-1 border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
-              />
-              <Button 
-                onClick={handleSendMessage}
-                disabled={!inputValue.trim() || isTyping}
-                className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-md"
-              >
-                <Send className="w-4 h-4" />
-              </Button>
+            
+            {/* Input Area */}
+            <div className="border-t p-4">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder={`Chat with ${agent.name}...`}
+                  className="flex-1 px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={isTyping}
+                />
+                <Button 
+                  onClick={handleSendMessage} 
+                  disabled={!inputValue.trim() || isTyping}
+                  className={`bg-gradient-to-r ${agent.color} hover:opacity-90`}
+                >
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
+              <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
+                <Zap className="w-3 h-3" />
+                <span>Powered by AI • Natural Language Processing • Context Awareness</span>
+              </div>
             </div>
+          </div>
+        </Card>
+
+        {/* Agent Capabilities */}
+        <Card className="p-4">
+          <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+            <MessageSquare className="w-4 h-4" />
+            AI Capabilities & Services
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {agent.capabilities.map((capability, index) => (
+              <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+                <Sparkles className="w-3 h-3 text-purple-500" />
+                <span className="text-sm text-gray-700">{capability}</span>
+              </div>
+            ))}
           </div>
         </Card>
       </div>
