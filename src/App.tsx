@@ -22,7 +22,7 @@ const App = () => (
           <Route path="/agent-contacts" element={<AgentContacts />} />
           <Route path="/ai-test" element={<AITest />} />
           <Route path="*" element={<NotFound />} />
-        Routes>
+        </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
