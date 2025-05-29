@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { intentRecognitionService } from './intentRecognitionService';
 
@@ -153,14 +152,14 @@ class SMSIntegrationService {
     let message = `Hi! This is ${agentName}. I received your message`;
     
     if (intent.urgency === 'critical') {
-      message += ' and I'm treating it as urgent';
+      message += ' and I am treating it as urgent';
     }
     
     if (intent.requiresTeamActivation) {
-      message += '. I\'m coordinating with the team';
+      message += '. I am coordinating with the team';
     }
     
-    message += '. I\'ll update you shortly.';
+    message += '. I will update you shortly.';
     
     await this.sendSMS(workflow.phoneNumber, message, intent.suggestedAgent);
   }
@@ -193,7 +192,7 @@ class SMSIntegrationService {
     
     // Notify about team activation
     await this.sendSMS(workflow.phoneNumber, 
-      `I've activated the ${intent.category} team: ${teamMembers.map(id => this.getAgentDisplayName(id)).join(', ')}. They're working on this now.`,
+      `I have activated the ${intent.category} team: ${teamMembers.map(id => this.getAgentDisplayName(id)).join(', ')}. They are working on this now.`,
       intent.suggestedAgent
     );
   }
@@ -232,12 +231,12 @@ class SMSIntegrationService {
     
     if (entities.dates || entities.times) {
       await this.sendSMS(workflow.phoneNumber, 
-        'I\'ll check calendar availability and send you meeting options shortly.',
+        'I will check calendar availability and send you meeting options shortly.',
         'executive-eva'
       );
     } else {
       await this.sendSMS(workflow.phoneNumber, 
-        'What dates/times work best for you? I\'ll find the best option.',
+        'What dates/times work best for you? I will find the best option.',
         'executive-eva'
       );
     }
@@ -247,7 +246,7 @@ class SMSIntegrationService {
     const intent = workflow.context.intent;
     
     await this.sendSMS(workflow.phoneNumber, 
-      `I'm breaking this down into actionable tasks and assigning them to the right team members. You'll get progress updates.`,
+      'I am breaking this down into actionable tasks and assigning them to the right team members. You will get progress updates.',
       intent.suggestedAgent
     );
   }

@@ -1,0 +1,89 @@
+
+import React, { useState } from 'react';
+import { AgentContactsList } from '@/components/AgentContactsList';
+import { iOSMessageInterface } from '@/components/iOSMessageInterface';
+
+// Mock data for demonstration
+const mockMessages = [
+  {
+    id: '1',
+    content: 'Hi! How can I help you with your business today?',
+    sender: 'agent' as const,
+    timestamp: new Date(Date.now() - 300000),
+    status: 'read' as const
+  },
+  {
+    id: '2',
+    content: 'I need to schedule a marketing meeting for tomorrow',
+    sender: 'user' as const,
+    timestamp: new Date(Date.now() - 240000),
+    status: 'read' as const
+  },
+  {
+    id: '3',
+    content: 'Perfect! Let me check the calendar and coordinate with Maya Creative from our marketing team. What time works best for you?',
+    sender: 'agent' as const,
+    timestamp: new Date(Date.now() - 180000),
+    status: 'read' as const
+  }
+];
+
+const mockAgent = {
+  id: 'executive-eva',
+  name: 'Executive Eva',
+  role: 'Executive Assistant',
+  avatar: '/placeholder.svg',
+  status: 'online' as const,
+  isTyping: false
+};
+
+export const AgentContacts: React.FC = () => {
+  const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
+  const [messages, setMessages] = useState(mockMessages);
+
+  const handleSelectAgent = (agentId: string) => {
+    setSelectedAgent(agentId);
+    // Load messages for selected agent
+  };
+
+  const handleSendMessage = (message: string) => {
+    const newMessage = {
+      id: Date.now().toString(),
+      content: message,
+      sender: 'user' as const,
+      timestamp: new Date(),
+      status: 'sent' as const
+    };
+    
+    setMessages(prev => [...prev, newMessage]);
+    
+    // Simulate agent response
+    setTimeout(() => {
+      const agentResponse = {
+        id: (Date.now() + 1).toString(),
+        content: "I understand! I'm working on that right now and will coordinate with the team. I'll update you shortly.",
+        sender: 'agent' as const,
+        timestamp: new Date(),
+        status: 'read' as const
+      };
+      setMessages(prev => [...prev, agentResponse]);
+    }, 2000);
+  };
+
+  const handleBack = () => {
+    setSelectedAgent(null);
+  };
+
+  if (selectedAgent) {
+    return (
+      <iOSMessageInterface
+        agent={mockAgent}
+        messages={messages}
+        onSendMessage={handleSendMessage}
+        onBack={handleBack}
+      />
+    );
+  }
+
+  return <AgentContactsList />;
+};
