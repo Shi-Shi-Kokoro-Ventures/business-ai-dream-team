@@ -4,7 +4,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Send, ArrowLeft, Phone, Video, Info } from 'lucide-react';
-import { Card } from '@/components/ui/card';
 
 interface Message {
   id: string;
@@ -37,7 +36,6 @@ export const IOSMessageInterface: React.FC<IOSMessageInterfaceProps> = ({
   onBack
 }) => {
   const [newMessage, setNewMessage] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -70,42 +68,38 @@ export const IOSMessageInterface: React.FC<IOSMessageInterfaceProps> = ({
     });
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIndicator = (status: string) => {
     switch (status) {
-      case 'sent': return '✓';
-      case 'delivered': return '✓✓';
-      case 'read': return '✓✓';
-      default: return '';
+      case 'sent': return <span className="text-xs text-white/70">✓</span>;
+      case 'delivered': return <span className="text-xs text-white/70">✓✓</span>;
+      case 'read': return <span className="text-xs text-white/70">Read</span>;
+      default: return null;
     }
-  };
-
-  const getStatusColor = (status: string) => {
-    return status === 'read' ? 'text-blue-500' : 'text-gray-400';
   };
 
   return (
     <div className="flex flex-col h-screen bg-white max-w-md mx-auto">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+      {/* iOS Header */}
+      <div className="bg-white/95 backdrop-blur-md border-b border-gray-200/50 px-4 py-2 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center space-x-3">
           <Button
             variant="ghost"
             size="sm"
             onClick={onBack}
-            className="p-1 hover:bg-gray-100 rounded-full"
+            className="p-1 hover:bg-gray-100/50 rounded-full w-8 h-8"
           >
             <ArrowLeft className="w-5 h-5 text-blue-500" />
           </Button>
           
           <div className="flex items-center space-x-3">
             <div className="relative">
-              <Avatar className="w-10 h-10">
+              <Avatar className="w-8 h-8">
                 <AvatarImage src={agent.avatar} alt={agent.name} />
-                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-sm">
+                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-xs">
                   {agent.name.split(' ').map(n => n[0]).join('')}
                 </AvatarFallback>
               </Avatar>
-              <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
+              <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${
                 agent.status === 'online' ? 'bg-green-500' : 
                 agent.status === 'busy' ? 'bg-red-500' : 
                 agent.status === 'away' ? 'bg-yellow-500' : 'bg-gray-400'
@@ -113,7 +107,7 @@ export const IOSMessageInterface: React.FC<IOSMessageInterfaceProps> = ({
             </div>
             
             <div>
-              <h2 className="font-semibold text-gray-900">{agent.name}</h2>
+              <h2 className="font-semibold text-black text-sm leading-tight">{agent.name}</h2>
               <p className="text-xs text-gray-500">
                 {agent.isTyping ? 'typing...' : agent.status}
               </p>
@@ -121,59 +115,56 @@ export const IOSMessageInterface: React.FC<IOSMessageInterfaceProps> = ({
           </div>
         </div>
 
-        <div className="flex space-x-2">
-          <Button variant="ghost" size="sm" className="p-2 hover:bg-gray-100 rounded-full">
-            <Phone className="w-5 h-5 text-blue-500" />
+        <div className="flex space-x-1">
+          <Button variant="ghost" size="sm" className="p-2 hover:bg-gray-100/50 rounded-full w-8 h-8">
+            <Phone className="w-4 h-4 text-blue-500" />
           </Button>
-          <Button variant="ghost" size="sm" className="p-2 hover:bg-gray-100 rounded-full">
-            <Video className="w-5 h-5 text-blue-500" />
-          </Button>
-          <Button variant="ghost" size="sm" className="p-2 hover:bg-gray-100 rounded-full">
-            <Info className="w-5 h-5 text-blue-500" />
+          <Button variant="ghost" size="sm" className="p-2 hover:bg-gray-100/50 rounded-full w-8 h-8">
+            <Video className="w-4 h-4 text-blue-500" />
           </Button>
         </div>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 bg-gray-50">
+      {/* Messages Area */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 bg-white">
         {messages.map((message, index) => {
           const showTimestamp = index === 0 || 
             new Date(message.timestamp).getTime() - new Date(messages[index - 1].timestamp).getTime() > 300000;
           
+          const isConsecutive = index > 0 && 
+            messages[index - 1].sender === message.sender && 
+            new Date(message.timestamp).getTime() - new Date(messages[index - 1].timestamp).getTime() < 60000;
+          
           return (
-            <div key={message.id}>
+            <div key={message.id} className="mb-1">
               {showTimestamp && (
-                <div className="text-center text-xs text-gray-500 mb-4">
+                <div className="text-center text-xs text-gray-500 mb-4 mt-4">
                   {formatTime(message.timestamp)}
                 </div>
               )}
               
-              <div className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
-                  message.sender === 'user' 
-                    ? 'bg-blue-500 text-white rounded-br-md' 
-                    : 'bg-white text-gray-900 rounded-bl-md shadow-sm border border-gray-200'
-                }`}>
-                  <p className="text-sm leading-relaxed">{message.content}</p>
-                  
-                  {message.sender === 'user' && (
-                    <div className={`text-xs mt-1 flex justify-end ${getStatusColor(message.status)}`}>
-                      {getStatusIcon(message.status)}
-                    </div>
-                  )}
+              <div className={`flex items-end space-x-2 ${message.sender === 'user' ? 'justify-end' : 'justify-start'} ${isConsecutive ? 'mb-1' : 'mb-2'}`}>
+                <div className={`ios-message-bubble ${message.sender} ${isConsecutive ? 'mb-0' : ''}`}>
+                  <p className="text-sm leading-relaxed break-words">{message.content}</p>
                 </div>
               </div>
+              
+              {message.sender === 'user' && !isConsecutive && (
+                <div className="flex justify-end mr-2 mt-1">
+                  {getStatusIndicator(message.status)}
+                </div>
+              )}
             </div>
           );
         })}
         
         {agent.isTyping && (
-          <div className="flex justify-start">
-            <div className="bg-white text-gray-900 rounded-2xl rounded-bl-md shadow-sm border border-gray-200 px-4 py-2">
+          <div className="flex justify-start mb-4">
+            <div className="ios-message-bubble agent">
               <div className="flex space-x-1">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
               </div>
             </div>
           </div>
@@ -182,8 +173,8 @@ export const IOSMessageInterface: React.FC<IOSMessageInterfaceProps> = ({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Area */}
-      <div className="bg-white border-t border-gray-200 px-4 py-3">
+      {/* iOS Input Area */}
+      <div className="bg-white border-t border-gray-200/50 px-4 py-3 safe-area-bottom">
         <div className="flex items-end space-x-3">
           <div className="flex-1 relative">
             <Input
@@ -191,7 +182,7 @@ export const IOSMessageInterface: React.FC<IOSMessageInterfaceProps> = ({
               onChange={(e) => setNewMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="iMessage"
-              className="rounded-full border-gray-300 pr-12 bg-gray-100 border-0 focus:ring-2 focus:ring-blue-500"
+              className="rounded-full border border-gray-300 pr-12 bg-gray-100/50 focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm min-h-[36px] py-2"
               maxLength={1000}
             />
           </div>
@@ -199,9 +190,13 @@ export const IOSMessageInterface: React.FC<IOSMessageInterfaceProps> = ({
           <Button
             onClick={handleSend}
             disabled={!newMessage.trim()}
-            className="w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed p-0"
+            className={`w-8 h-8 rounded-full p-0 transition-all duration-200 ${
+              newMessage.trim() 
+                ? 'bg-blue-500 hover:bg-blue-600 text-white' 
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }`}
           >
-            <Send className="w-5 h-5" />
+            <Send className="w-4 h-4" />
           </Button>
         </div>
       </div>
