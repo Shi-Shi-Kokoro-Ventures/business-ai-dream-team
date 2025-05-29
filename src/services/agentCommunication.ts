@@ -583,7 +583,7 @@ class AgentCommunicationService {
 
     const board = await this.updateTrelloBoard(agentId, 'createBoard', undefined, undefined, undefined, boardData);
     
-    if (board.success) {
+    if (board.success && board.data) {
       // Create standard grant tracking lists
       const lists = [
         'Research & Planning',

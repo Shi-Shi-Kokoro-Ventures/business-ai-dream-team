@@ -44,7 +44,7 @@ class NonprofitIntegrationService {
 
     // Create Trello board for grant tracking
     const board = await agentCommunication.createGrantTrackingBoard('grant-expert', grantName);
-    if (board.success) {
+    if (board.success && board.data) {
       project.trelloBoardId = board.data.id;
     }
 
@@ -54,7 +54,7 @@ class NonprofitIntegrationService {
       `Grant Team: ${grantName}`,
       `Collaborative workspace for ${grantName} grant application and management`
     );
-    if (course.success) {
+    if (course.success && course.data) {
       project.classroomCourseId = course.data.id;
     }
 
@@ -72,7 +72,7 @@ class NonprofitIntegrationService {
 
     // Update Trello board
     if (project.trelloBoardId) {
-      await agentCommunication.updateTrelloBoard(
+      const trelloUpdate = await agentCommunication.updateTrelloBoard(
         'grant-expert',
         'createCard',
         project.trelloBoardId,
@@ -84,16 +84,24 @@ class NonprofitIntegrationService {
           dueDate: project.deadline
         }
       );
+      
+      if (!trelloUpdate.success) {
+        console.warn('Failed to update Trello board:', trelloUpdate.error);
+      }
     }
 
     // Post announcement in Classroom
     if (project.classroomCourseId) {
-      await agentCommunication.postGrantUpdateAnnouncement(
+      const classroomUpdate = await agentCommunication.postGrantUpdateAnnouncement(
         'grant-expert',
         project.classroomCourseId,
         newStatus,
         notes || 'Status updated by AI Grant Expert'
       );
+      
+      if (!classroomUpdate.success) {
+        console.warn('Failed to post classroom announcement:', classroomUpdate.error);
+      }
     }
 
     this.grantProjects.set(projectId, project);
@@ -128,7 +136,7 @@ class NonprofitIntegrationService {
       }
     );
 
-    if (card.success) {
+    if (card.success && card.data) {
       campaign.trelloCardId = card.data.id;
     }
 
