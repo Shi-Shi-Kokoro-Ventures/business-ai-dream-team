@@ -31,5 +31,65 @@ export const aiService = {
       isTyping: false,
       lastSeen: new Date()
     };
+  },
+
+  getAgentPersonality: (agentId: string) => {
+    // Mock agent personalities
+    const personalities = {
+      'executive-eva': {
+        name: 'Executive Eva',
+        personality: 'Professional, authoritative, and strategic. Focuses on coordination and oversight.',
+        communicationStyle: 'Direct and decisive'
+      },
+      'strategy': {
+        name: 'Alex Strategy', 
+        personality: 'Analytical, forward-thinking, and methodical. Expert in strategic planning.',
+        communicationStyle: 'Thoughtful and data-driven'
+      },
+      'marketing': {
+        name: 'Maya Creative',
+        personality: 'Creative, enthusiastic, and brand-focused. Passionate about campaigns.',
+        communicationStyle: 'Energetic and persuasive'
+      },
+      'finance': {
+        name: 'Felix Finance',
+        personality: 'Precise, analytical, and risk-aware. Detail-oriented with numbers.',
+        communicationStyle: 'Methodical and accurate'
+      },
+      'operations': {
+        name: 'Oliver Operations',
+        personality: 'Systematic, efficient, and process-oriented. Focused on optimization.',
+        communicationStyle: 'Clear and systematic'
+      },
+      'customer': {
+        name: 'Clara Customer',
+        personality: 'Empathetic, service-oriented, and relationship-focused.',
+        communicationStyle: 'Warm and supportive'
+      }
+    };
+    
+    return personalities[agentId as keyof typeof personalities] || null;
+  },
+
+  processMessage: async (agentId: string, message: string, context?: any) => {
+    // Enhanced message processing with personality
+    const personality = aiService.getAgentPersonality(agentId);
+    
+    if (!personality) {
+      return message;
+    }
+
+    // Simple message enhancement based on agent personality
+    const enhancements = {
+      'executive-eva': (msg: string) => `As your executive assistant, ${msg.toLowerCase()}`,
+      'strategy': (msg: string) => `From a strategic perspective, ${msg.toLowerCase()}`,
+      'marketing': (msg: string) => `Let's create something amazing! ${msg}`,
+      'finance': (msg: string) => `Analyzing the financial aspects: ${msg.toLowerCase()}`,
+      'operations': (msg: string) => `To optimize this process: ${msg.toLowerCase()}`,
+      'customer': (msg: string) => `I'm here to help! ${msg}`
+    };
+
+    const enhanceFunction = enhancements[agentId as keyof typeof enhancements];
+    return enhanceFunction ? enhanceFunction(message) : message;
   }
 };
