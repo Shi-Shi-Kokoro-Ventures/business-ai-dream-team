@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { AgentContactsList } from '@/components/AgentContactsList';
-import { iOSMessageInterface } from '@/components/iOSMessageInterface';
+import { IOSMessageInterface } from '@/components/iOSMessageInterface';
 
 // Mock data for demonstration
 const mockMessages = [
@@ -85,7 +84,7 @@ export const AgentContacts: React.FC = () => {
 
   if (selectedAgent) {
     return (
-      <iOSMessageInterface
+      <IOSMessageInterface
         agent={mockAgent}
         messages={messages}
         onSendMessage={handleSendMessage}

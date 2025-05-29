@@ -23,14 +23,14 @@ interface Agent {
   isTyping?: boolean;
 }
 
-interface iOSMessageInterfaceProps {
+interface IOSMessageInterfaceProps {
   agent: Agent;
   messages: Message[];
   onSendMessage: (message: string) => void;
   onBack: () => void;
 }
 
-export const iOSMessageInterface: React.FC<iOSMessageInterfaceProps> = ({
+export const IOSMessageInterface: React.FC<IOSMessageInterfaceProps> = ({
   agent,
   messages,
   onSendMessage,
