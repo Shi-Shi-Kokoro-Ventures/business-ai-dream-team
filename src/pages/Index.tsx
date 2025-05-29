@@ -20,7 +20,8 @@ import {
   Search,
   Phone,
   FileText,
-  Shield
+  Shield,
+  Crown
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
