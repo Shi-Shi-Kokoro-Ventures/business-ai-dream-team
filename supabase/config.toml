@@ -1,1 +1,23 @@
+
 project_id = "cowjsrngyhpofjvbwsov"
+
+[functions.process-document]
+verify_jwt = true
+
+[functions.send-sms]
+verify_jwt = true
+
+[functions.send-email]
+verify_jwt = true
+
+[functions.web-research]
+verify_jwt = true
+
+[functions.generate-code]
+verify_jwt = true
+
+[functions.make-phone-call]
+verify_jwt = true
+
+[functions.financial-analysis]
+verify_jwt = true
