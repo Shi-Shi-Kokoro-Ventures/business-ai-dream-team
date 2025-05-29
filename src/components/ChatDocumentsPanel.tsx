@@ -52,23 +52,23 @@ const ChatDocumentsPanel = ({ agentId }: ChatDocumentsPanelProps) => {
     }
   };
 
-  const downloadDocument = async (document: Document) => {
+  const downloadDocument = async (doc: Document) => {
     try {
       const { data, error } = await supabase.storage
         .from('agent-documents')
-        .download(document.file_path);
+        .download(doc.file_path);
 
       if (error) throw error;
 
       // Create a download link
       const url = URL.createObjectURL(data);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = document.original_filename;
-      document.body.appendChild(a);
-      a.click();
+      const link = globalThis.document.createElement('a');
+      link.href = url;
+      link.download = doc.original_filename;
+      globalThis.document.body.appendChild(link);
+      link.click();
       URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      globalThis.document.body.removeChild(link);
     } catch (error) {
       console.error('Error downloading document:', error);
     }
