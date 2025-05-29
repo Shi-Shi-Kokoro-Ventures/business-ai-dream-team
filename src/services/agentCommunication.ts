@@ -1,3 +1,4 @@
+
 import { Agent, AgentMessage, AutonomousTask } from '@/types/agent';
 import { aiService } from './aiService';
 
@@ -209,27 +210,6 @@ class AgentCommunicationService {
     return task.priority || 'medium';
   }
 
-  private enhanceTaskDescription(description: string): string {
-    return description + " [AI-Enhanced with predictive analysis and optimization recommendations]";
-  }
-
-  private suggestCollaboratingAgents(task: AutonomousTask): string[] {
-    const collaborationMap: { [key: string]: string[] } = {
-      'strategy': ['data', 'intelligence', 'finance'],
-      'marketing': ['communications', 'data', 'documents'],
-      'finance': ['strategy', 'data', 'legal'],
-      'operations': ['cto', 'hr', 'documents'],
-      'legal': ['finance', 'hr', 'strategy'],
-      'cto': ['operations', 'data', 'intelligence'],
-      'data': ['strategy', 'marketing', 'intelligence'],
-      'intelligence': ['strategy', 'marketing', 'data'],
-      'communications': ['marketing', 'customer', 'documents'],
-      'documents': ['legal', 'communications', 'finance']
-    };
-    
-    return collaborationMap[task.assignedAgent] || [];
-  }
-
   private async enhanceTaskWithAI(agentId: string, description: string): Promise<string> {
     const personality = aiService.getAgentPersonality(agentId);
     if (!personality) return description;
@@ -359,6 +339,23 @@ class AgentCommunicationService {
     );
   }
 
+  private suggestCollaboratingAgents(task: AutonomousTask): string[] {
+    const collaborationMap: { [key: string]: string[] } = {
+      'strategy': ['data', 'intelligence', 'finance'],
+      'marketing': ['communications', 'data', 'documents'],
+      'finance': ['strategy', 'data', 'legal'],
+      'operations': ['cto', 'hr', 'documents'],
+      'legal': ['finance', 'hr', 'strategy'],
+      'cto': ['operations', 'data', 'intelligence'],
+      'data': ['strategy', 'marketing', 'intelligence'],
+      'intelligence': ['strategy', 'marketing', 'data'],
+      'communications': ['marketing', 'customer', 'documents'],
+      'documents': ['legal', 'communications', 'finance']
+    };
+    
+    return collaborationMap[task.assignedAgent] || [];
+  }
+
   deactivateAgent(agentId: string) {
     const agent = this.agents.get(agentId);
     if (agent) {
@@ -375,8 +372,8 @@ class AgentCommunicationService {
     }
   }
 
-  initiateCollaboration(initiatorId: string, collaboratorIds: string[], taskDescription: string) {
-    const task = this.createTask({
+  async initiateCollaboration(initiatorId: string, collaboratorIds: string[], taskDescription: string) {
+    const task = await this.createTask({
       title: 'Elite Collaborative Initiative',
       description: taskDescription,
       assignedAgent: initiatorId,

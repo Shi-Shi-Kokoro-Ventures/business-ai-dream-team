@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Send, Brain, Sparkles, Zap, Bot, MessageSquare, Activity } from 'lucide-react';
 import { Agent } from '@/types/agent';
-import { aiService } from '@/services/aiService';
+import { realAiService } from '@/services/realAiService';
 
 interface ChatInterfaceProps {
   agent: Agent;
@@ -40,21 +40,33 @@ const ChatInterface = ({ agent, onBack }: ChatInterfaceProps) => {
       setIsTyping(true);
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate thinking time
       
-      const greeting = await aiService.processMessage(agent.id, "Hello! I'm ready to assist you.");
+      try {
+        const greeting = await realAiService.processMessage(agent.id, "Hello! I'm ready to assist you. How can I help you today?");
+        
+        const initialMessage: Message = {
+          id: Date.now().toString(),
+          content: greeting,
+          sender: 'agent',
+          timestamp: new Date()
+        };
+        
+        setMessages([initialMessage]);
+      } catch (error) {
+        console.error('Error getting initial greeting:', error);
+        const fallbackMessage: Message = {
+          id: Date.now().toString(),
+          content: `Hello! I'm ${agent.name}, your ${agent.role}. I'm ready to assist you with my expertise in ${agent.capabilities.slice(0, 3).join(', ')}. How can I help you today?`,
+          sender: 'agent',
+          timestamp: new Date()
+        };
+        setMessages([fallbackMessage]);
+      }
       
-      const initialMessage: Message = {
-        id: Date.now().toString(),
-        content: greeting,
-        sender: 'agent',
-        timestamp: new Date()
-      };
-      
-      setMessages([initialMessage]);
       setIsTyping(false);
     };
 
     sendInitialGreeting();
-  }, [agent.id]);
+  }, [agent.id, agent.name, agent.role, agent.capabilities]);
 
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
@@ -71,13 +83,14 @@ const ChatInterface = ({ agent, onBack }: ChatInterfaceProps) => {
     setIsTyping(true);
 
     // Simulate AI thinking time
-    const thinkingTime = Math.random() * 2000 + 500; // 0.5-2.5 seconds
+    const thinkingTime = Math.random() * 2000 + 1000; // 1-3 seconds
     await new Promise(resolve => setTimeout(resolve, thinkingTime));
 
     try {
-      const response = await aiService.processMessage(agent.id, userMessage.content, {
+      const response = await realAiService.processMessage(agent.id, userMessage.content, {
         previousMessages: messages.slice(-5), // Provide recent context
-        agentCapabilities: agent.capabilities
+        agentCapabilities: agent.capabilities,
+        userContext: 'chat_interface'
       });
 
       const agentMessage: Message = {
@@ -89,9 +102,10 @@ const ChatInterface = ({ agent, onBack }: ChatInterfaceProps) => {
 
       setMessages(prev => [...prev, agentMessage]);
     } catch (error) {
+      console.error('Error getting AI response:', error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: "I apologize, but I'm experiencing some technical difficulties. Please try again in a moment.",
+        content: "I apologize, but I'm experiencing some technical difficulties with my AI processing. Please try again in a moment, or let me help you with a more basic response.",
         sender: 'agent',
         timestamp: new Date()
       };
@@ -108,7 +122,7 @@ const ChatInterface = ({ agent, onBack }: ChatInterfaceProps) => {
     }
   };
 
-  const personality = aiService.getAgentPersonality(agent.id);
+  const personality = realAiService.getAgentPersonality(agent.id);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -133,7 +147,7 @@ const ChatInterface = ({ agent, onBack }: ChatInterfaceProps) => {
             </Badge>
             <Badge className="bg-purple-100 text-purple-800 border-purple-200">
               <Brain className="w-3 h-3 mr-1" />
-              Intelligent
+              GPT-4 Powered
             </Badge>
           </div>
         </div>
@@ -144,7 +158,7 @@ const ChatInterface = ({ agent, onBack }: ChatInterfaceProps) => {
             <div className="flex items-start gap-3">
               <Sparkles className="w-5 h-5 text-purple-500 mt-1" />
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">AI Personality Profile</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">Real AI Personality Profile</h3>
                 <p className="text-sm text-gray-700 mb-2"><strong>Personality:</strong> {personality.personality}</p>
                 <p className="text-sm text-gray-700 mb-2"><strong>Communication Style:</strong> {personality.communicationStyle}</p>
                 <div className="flex flex-wrap gap-1">
@@ -200,7 +214,7 @@ const ChatInterface = ({ agent, onBack }: ChatInterfaceProps) => {
                         <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                         <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                       </div>
-                      <span className="text-sm opacity-80">Thinking...</span>
+                      <span className="text-sm opacity-80">AI Processing...</span>
                     </div>
                   </div>
                 </div>
@@ -231,7 +245,7 @@ const ChatInterface = ({ agent, onBack }: ChatInterfaceProps) => {
               </div>
               <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
                 <Zap className="w-3 h-3" />
-                <span>Powered by AI • Natural Language Processing • Context Awareness</span>
+                <span>Powered by Real AI • OpenAI GPT-4 • Dynamic Personality Engine</span>
               </div>
             </div>
           </div>
@@ -241,7 +255,7 @@ const ChatInterface = ({ agent, onBack }: ChatInterfaceProps) => {
         <Card className="p-4">
           <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
             <MessageSquare className="w-4 h-4" />
-            AI Capabilities & Services
+            Real AI Capabilities & Intelligence
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {agent.capabilities.map((capability, index) => (
