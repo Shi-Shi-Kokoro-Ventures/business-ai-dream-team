@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
 import AgentCard from '@/components/AgentCard';
 import ChatInterface from '@/components/ChatInterface';
+import AutonomousAgentMonitor from '@/components/AutonomousAgentMonitor';
 import { 
   Brain, 
   TrendingUp, 
@@ -11,9 +11,11 @@ import {
   Target,
   Sparkles,
   Bot,
-  BarChart3
+  BarChart3,
+  Activity
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface Agent {
   id: string;
@@ -27,6 +29,7 @@ interface Agent {
 
 const Index = () => {
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
+  const [showMonitor, setShowMonitor] = useState(false);
 
   const agents: Agent[] = [
     {
@@ -89,6 +92,22 @@ const Index = () => {
     return <ChatInterface agent={selectedAgent} onBack={() => setSelectedAgent(null)} />;
   }
 
+  if (showMonitor) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-between mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">Autonomous Agent Network</h1>
+            <Button onClick={() => setShowMonitor(false)} variant="outline">
+              Back to Dashboard
+            </Button>
+          </div>
+          <AutonomousAgentMonitor agents={agents} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <div className="container mx-auto px-4 py-8">
@@ -103,17 +122,21 @@ const Index = () => {
             </h1>
           </div>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Your intelligent team of AI agents ready to transform your business operations, strategy, and growth
+            Your autonomous team of AI agents that communicate with each other and work together to transform your business
           </p>
           <div className="flex items-center justify-center gap-2 mt-4">
             <Badge className="bg-green-100 text-green-700 border-green-200 px-3 py-1">
               <Sparkles className="w-3 h-3 mr-1" />
-              6 Agents Available
+              6 Autonomous Agents
             </Badge>
             <Badge className="bg-blue-100 text-blue-700 border-blue-200 px-3 py-1">
               <BarChart3 className="w-3 h-3 mr-1" />
-              24/7 Support
+              Inter-Agent Communication
             </Badge>
+            <Button onClick={() => setShowMonitor(true)} className="ml-4" variant="outline">
+              <Activity className="w-4 h-4 mr-2" />
+              Monitor Network
+            </Button>
           </div>
         </div>
 
@@ -149,17 +172,17 @@ const Index = () => {
           ))}
         </div>
 
-        {/* Footer */}
+        {/* Enhanced Footer */}
         <div className="text-center mt-16 p-8 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/20">
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">Ready to Transform Your Business?</h3>
+          <h3 className="text-2xl font-bold text-gray-900 mb-4">Autonomous AI Business Network</h3>
           <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-            Click on any agent above to start a conversation and discover how AI can revolutionize your business operations
+            These agents work autonomously, communicate with each other, share insights, and collaborate on tasks to optimize your business operations 24/7
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <Badge variant="outline" className="border-blue-200 text-blue-700">Strategic Planning</Badge>
-            <Badge variant="outline" className="border-pink-200 text-pink-700">Marketing Automation</Badge>
-            <Badge variant="outline" className="border-green-200 text-green-700">Financial Optimization</Badge>
-            <Badge variant="outline" className="border-purple-200 text-purple-700">Team Development</Badge>
+            <Badge variant="outline" className="border-blue-200 text-blue-700">Autonomous Decision Making</Badge>
+            <Badge variant="outline" className="border-pink-200 text-pink-700">Inter-Agent Communication</Badge>
+            <Badge variant="outline" className="border-green-200 text-green-700">Collaborative Task Execution</Badge>
+            <Badge variant="outline" className="border-purple-200 text-purple-700">Real-time Business Optimization</Badge>
           </div>
         </div>
       </div>
