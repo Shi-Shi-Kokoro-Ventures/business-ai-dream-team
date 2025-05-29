@@ -24,7 +24,12 @@ import {
   Crown,
   Filter,
   Grid3X3,
-  List
+  List,
+  Award,
+  Handshake,
+  Heart,
+  Megaphone,
+  Zap
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -37,7 +42,7 @@ const Index = () => {
   const [showMonitor, setShowMonitor] = useState(false);
   const [showExecutiveDashboard, setShowExecutiveDashboard] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [filterCategory, setFilterCategory] = useState('all');
 
   const agents: Agent[] = [
@@ -183,6 +188,62 @@ const Index = () => {
       color: 'from-amber-500 to-orange-600',
       isActive: true,
       lastActivity: new Date()
+    },
+    // NEW ELITE AGENTS
+    {
+      id: 'grant-expert',
+      name: 'Dr. Grant Sterling',
+      role: 'Senior Grant Writing Specialist',
+      description: 'Elite grant writing expert specializing in federal grants, foundation funding, and research proposals with guaranteed approval strategies and compliance mastery.',
+      capabilities: ['Federal Grants', 'State Funding', 'Foundation Grants', 'NIH/NSF Proposals', 'Compliance Review', 'Budget Analysis', 'Narrative Development', 'Success Rate Optimization'],
+      icon: <Award className="w-6 h-6" />,
+      color: 'from-yellow-500 to-amber-600',
+      isActive: true,
+      lastActivity: new Date()
+    },
+    {
+      id: 'government-contracts',
+      name: 'Agent Samuel Contracts',
+      role: 'Government Procurement Specialist',
+      description: 'Government contracting master navigating federal procurement processes, GSA schedules, and RFP responses with expert compliance and winning strategies.',
+      capabilities: ['Federal Contracting', 'GSA Schedules', 'RFP Responses', 'Compliance Auditing', 'Vendor Registration', 'Contract Negotiation', 'Procurement Strategy', 'Government Relations'],
+      icon: <Shield className="w-6 h-6" />,
+      color: 'from-blue-700 to-blue-900',
+      isActive: true,
+      lastActivity: new Date()
+    },
+    {
+      id: 'chief-strategy',
+      name: 'Victoria Sterling',
+      role: 'Chief Strategy Officer & Legal Innovation Expert',
+      description: 'Strategic mastermind specializing in legal loophole identification, creative compliance solutions, and innovative business strategies that maximize success within legal frameworks.',
+      capabilities: ['Legal Loophole Analysis', 'Regulatory Navigation', 'Creative Compliance', 'Strategic Positioning', 'Risk Mitigation', 'Innovation Strategy', 'Competitive Advantage', 'Legal Innovation'],
+      icon: <Crown className="w-6 h-6" />,
+      color: 'from-purple-600 to-violet-700',
+      isActive: true,
+      lastActivity: new Date()
+    },
+    {
+      id: 'negotiation-expert',
+      name: 'Marcus Dealmaker',
+      role: 'Master Negotiator & Deal Architect',
+      description: 'Elite negotiation specialist creating win-win solutions, managing complex stakeholder relationships, and architecting deals that maximize value for all parties.',
+      capabilities: ['Contract Negotiation', 'Stakeholder Management', 'Win-Win Solutions', 'Conflict Resolution', 'Strategic Partnerships', 'Deal Architecture', 'Relationship Building', 'Value Optimization'],
+      icon: <Handshake className="w-6 h-6" />,
+      color: 'from-emerald-600 to-green-700',
+      isActive: true,
+      lastActivity: new Date()
+    },
+    {
+      id: 'digital-fundraising',
+      name: 'Diana Digital',
+      role: 'Digital Marketing & Fundraising Expert',
+      description: 'Nonprofit digital marketing specialist driving fundraising success through innovative campaigns, donor acquisition, and multi-channel digital strategies that maximize impact.',
+      capabilities: ['Digital Campaigns', 'Donor Acquisition', 'Crowdfunding', 'Social Media Fundraising', 'Grant Marketing', 'Email Fundraising', 'Nonprofit Marketing', 'Campaign Optimization'],
+      icon: <Heart className="w-6 h-6" />,
+      color: 'from-coral-500 to-red-600',
+      isActive: true,
+      lastActivity: new Date()
     }
   ];
 
@@ -243,7 +304,7 @@ const Index = () => {
               Elite AI Business Team
             </h1>
             <p className="text-lg text-gray-600 mt-2">
-              13 autonomous AI specialists with executive control & oversight
+              18 autonomous AI specialists with executive control & oversight
             </p>
           </div>
         </div>
@@ -253,7 +314,7 @@ const Index = () => {
           <Card className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-3xl font-bold text-blue-600">13</div>
+                <div className="text-3xl font-bold text-blue-600">18</div>
                 <div className="text-blue-700 font-medium">Elite Specialists</div>
               </div>
               <Bot className="w-8 h-8 text-blue-500" />
@@ -344,13 +405,15 @@ const Index = () => {
       <div className="text-center mt-16 p-8 bg-gradient-to-r from-white/80 to-blue-50/80 backdrop-blur-sm rounded-3xl border border-white/20 shadow-xl">
         <h3 className="text-3xl font-bold text-gray-900 mb-4">Executive-Controlled AI Business Network</h3>
         <p className="text-gray-700 mb-6 max-w-4xl mx-auto text-lg leading-relaxed">
-          Your elite AI team operates under complete executive control with secure, autonomous, and always under your authority.
+          Your elite AI team operates under complete executive control with secure, autonomous capabilities, always under your authority.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Badge variant="outline" className="border-purple-200 text-purple-700 px-3 py-2">Executive Permission Management</Badge>
           <Badge variant="outline" className="border-blue-200 text-blue-700 px-3 py-2">Real-time Monitoring & Control</Badge>
           <Badge variant="outline" className="border-green-200 text-green-700 px-3 py-2">Multi-Channel Executive Alerts</Badge>
           <Badge variant="outline" className="border-amber-200 text-amber-700 px-3 py-2">Crisis Escalation Protocols</Badge>
+          <Badge variant="outline" className="border-red-200 text-red-700 px-3 py-2">Grant & Contract Specialists</Badge>
+          <Badge variant="outline" className="border-emerald-200 text-emerald-700 px-3 py-2">Negotiation & Fundraising Experts</Badge>
         </div>
       </div>
     </div>

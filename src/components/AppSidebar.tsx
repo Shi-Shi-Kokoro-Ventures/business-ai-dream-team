@@ -152,11 +152,11 @@ export function AppSidebar({ onQuickAction }: AppSidebarProps) {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-blue-700">Active Agents</span>
-                  <Badge className="bg-green-100 text-green-800 border-green-200">13/13</Badge>
+                  <Badge className="bg-green-100 text-green-800 border-green-200">18/18</Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-blue-700">Response Time</span>
-                  <Badge className="bg-blue-100 text-blue-800 border-blue-200">< 2s</Badge>
+                  <Badge className="bg-blue-100 text-blue-800 border-blue-200">&lt; 2s</Badge>
                 </div>
               </div>
             </div>
