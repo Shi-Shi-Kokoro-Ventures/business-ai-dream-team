@@ -6,9 +6,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Phone, MessageSquare, Bell, Save, Check } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Phone, MessageSquare, Settings, Save, Check, TestTube } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import SMSTestingTool from './SMSTestingTool';
 
 interface SMSSettingsProps {
   onSettingsSaved?: (settings: any) => void;
@@ -137,107 +139,128 @@ const SMSSettings = ({ onSettingsSaved }: SMSSettingsProps) => {
   };
 
   return (
-    <Card className="p-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 text-white">
-          <Phone className="w-5 h-5" />
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900">SMS Notifications</h3>
-          <p className="text-sm text-gray-600">Configure real-time text message alerts from your AI agents</p>
-        </div>
-      </div>
+    <div className="space-y-6">
+      <Tabs defaultValue="settings" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="settings" className="flex items-center gap-2">
+            <Settings className="w-4 h-4" />
+            Settings
+          </TabsTrigger>
+          <TabsTrigger value="testing" className="flex items-center gap-2">
+            <TestTube className="w-4 h-4" />
+            Test SMS
+          </TabsTrigger>
+        </TabsList>
 
-      <div className="space-y-6">
-        {/* Phone Number Input */}
-        <div className="space-y-2">
-          <Label htmlFor="phone">Phone Number</Label>
-          <Input
-            id="phone"
-            type="tel"
-            value={phoneNumber}
-            onChange={handlePhoneChange}
-            placeholder="(555) 123-4567"
-            maxLength={14}
-            className="font-mono"
-          />
-          <p className="text-xs text-gray-500">Enter your US phone number to receive SMS notifications</p>
-        </div>
-
-        {/* Enable/Disable SMS */}
-        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-          <div className="flex items-center gap-3">
-            <MessageSquare className="w-5 h-5 text-gray-500" />
-            <div>
-              <Label htmlFor="sms-enabled">Enable SMS Notifications</Label>
-              <p className="text-xs text-gray-500">Receive text messages from your AI agents</p>
+        <TabsContent value="settings">
+          <Card className="p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 text-white">
+                <Phone className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">SMS Notifications</h3>
+                <p className="text-sm text-gray-600">Configure real-time text message alerts from your AI agents</p>
+              </div>
             </div>
-          </div>
-          <Switch
-            id="sms-enabled"
-            checked={enabled}
-            onCheckedChange={setEnabled}
-          />
-        </div>
 
-        {/* Notification Types */}
-        {enabled && (
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Bell className="w-4 h-4 text-gray-500" />
-              <Label>Notification Types</Label>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {notificationOptions.map((option) => (
-                <div
-                  key={option.id}
-                  className={`p-3 rounded-lg border cursor-pointer transition ${
-                    notificationTypes.includes(option.id)
-                      ? 'border-blue-400 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                  onClick={() => toggleNotificationType(option.id)}
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <Label className="cursor-pointer">{option.label}</Label>
-                    {notificationTypes.includes(option.id) && (
-                      <Badge className="bg-blue-100 text-blue-800 border-blue-200">Enabled</Badge>
-                    )}
+            <div className="space-y-6">
+              {/* Phone Number Input */}
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={phoneNumber}
+                  onChange={handlePhoneChange}
+                  placeholder="(555) 123-4567"
+                  maxLength={14}
+                  className="font-mono"
+                />
+                <p className="text-xs text-gray-500">Enter your US phone number to receive SMS notifications</p>
+              </div>
+
+              {/* Enable/Disable SMS */}
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <MessageSquare className="w-5 h-5 text-gray-500" />
+                  <div>
+                    <Label htmlFor="sms-enabled">Enable SMS Notifications</Label>
+                    <p className="text-xs text-gray-500">Receive text messages from your AI agents</p>
                   </div>
-                  <p className="text-xs text-gray-500">{option.description}</p>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
+                <Switch
+                  id="sms-enabled"
+                  checked={enabled}
+                  onCheckedChange={setEnabled}
+                />
+              </div>
 
-        <Button
-          className="w-full"
-          onClick={saveSettings}
-          disabled={isLoading || isSaved}
-        >
-          {isLoading ? (
-            <span className="flex items-center gap-2">
-              <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Saving...
-            </span>
-          ) : isSaved ? (
-            <span className="flex items-center gap-2">
-              <Check className="w-4 h-4" />
-              Saved
-            </span>
-          ) : (
-            <span className="flex items-center gap-2">
-              <Save className="w-4 h-4" />
-              Save Settings
-            </span>
-          )}
-        </Button>
-      </div>
-    </Card>
+              {/* Notification Types */}
+              {enabled && (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4 text-gray-500" />
+                    <Label>Notification Types</Label>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {notificationOptions.map((option) => (
+                      <div
+                        key={option.id}
+                        className={`p-3 rounded-lg border cursor-pointer transition ${
+                          notificationTypes.includes(option.id)
+                            ? 'border-blue-400 bg-blue-50'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                        onClick={() => toggleNotificationType(option.id)}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <Label className="cursor-pointer">{option.label}</Label>
+                          {notificationTypes.includes(option.id) && (
+                            <Badge className="bg-blue-100 text-blue-800 border-blue-200">Enabled</Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-500">{option.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <Button
+                className="w-full"
+                onClick={saveSettings}
+                disabled={isLoading || isSaved}
+              >
+                {isLoading ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Saving...
+                  </span>
+                ) : isSaved ? (
+                  <span className="flex items-center gap-2">
+                    <Check className="w-4 h-4" />
+                    Saved
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    <Save className="w-4 h-4" />
+                    Save Settings
+                  </span>
+                )}
+              </Button>
+            </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="testing">
+          <SMSTestingTool />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 

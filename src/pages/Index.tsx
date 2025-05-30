@@ -3,6 +3,7 @@ import { MainLayout } from '@/components/MainLayout';
 import EnhancedAgentCard from '@/components/EnhancedAgentCard';
 import EnterpriseMetrics from '@/components/EnterpriseMetrics';
 import AICapabilitiesShowcase from '@/components/AICapabilitiesShowcase';
+import SMSSettings from '@/components/SMSSettings';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -35,7 +36,6 @@ import {
   BookOpen,
   Megaphone
 } from 'lucide-react';
-import { agentCommunication } from '@/services/agentCommunication';
 
 const Index = () => {
   const [connectedAgents, setConnectedAgents] = useState(18);
@@ -44,11 +44,9 @@ const Index = () => {
 
   const handleAgentClick = (agentId: string) => {
     console.log(`Connecting to agent: ${agentId}`);
-    // In a real implementation, this would open a chat interface or agent interaction panel
   };
 
   useEffect(() => {
-    // Simulate real-time updates
     const interval = setInterval(() => {
       setConnectedAgents(prev => prev + Math.floor(Math.random() * 3) - 1);
     }, 5000);
@@ -224,9 +222,8 @@ const Index = () => {
   return (
     <MainLayout>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-        {/* Enhanced Header */}
         <div className="relative overflow-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%239C92AC\" fill-opacity=\"0.1\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"2\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
           
           <div className="relative container mx-auto px-6 py-20">
             <div className="text-center text-white">
@@ -282,8 +279,8 @@ const Index = () => {
               <TabsTrigger value="enterprise" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-xl py-3 font-semibold transition-all duration-300">
                 Enterprise
               </TabsTrigger>
-              <TabsTrigger value="comparison" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-xl py-3 font-semibold transition-all duration-300">
-                vs Salesforce
+              <TabsTrigger value="sms" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-xl py-3 font-semibold transition-all duration-300">
+                SMS Agents
               </TabsTrigger>
             </TabsList>
 
@@ -322,8 +319,70 @@ const Index = () => {
               <EnterpriseMetrics />
             </TabsContent>
 
-            <TabsContent value="comparison">
-              <EnterpriseMetrics />
+            <TabsContent value="sms">
+              <div className="space-y-8">
+                <div className="text-center mb-12">
+                  <h2 className="text-4xl font-bold text-gray-900 mb-4">SMS Agent Communication</h2>
+                  <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Text your AI agents directly from your phone. Get instant responses and trigger complex business workflows via SMS.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <Card className="p-8 bg-gradient-to-br from-green-50 to-emerald-50 border-0 shadow-xl">
+                    <div className="flex items-center gap-3 mb-6">
+                      <Phone className="w-8 h-8 text-green-600" />
+                      <h3 className="text-2xl font-bold text-gray-900">How to Use SMS Agents</h3>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                        <div>
+                          <h4 className="font-semibold text-gray-900">Configure Your Number</h4>
+                          <p className="text-gray-600 text-sm">Set up your phone number in SMS settings below</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                        <div>
+                          <h4 className="font-semibold text-gray-900">Text Your Request</h4>
+                          <p className="text-gray-600 text-sm">Send a message to our AI agents describing what you need</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                        <div>
+                          <h4 className="font-semibold text-gray-900">Get Instant Response</h4>
+                          <p className="text-gray-600 text-sm">Receive intelligent responses and task confirmations</p>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+
+                  <Card className="p-8 bg-gradient-to-br from-blue-50 to-indigo-50 border-0 shadow-xl">
+                    <div className="flex items-center gap-3 mb-6">
+                      <MessageSquare className="w-8 h-8 text-blue-600" />
+                      <h3 className="text-2xl font-bold text-gray-900">Example Commands</h3>
+                    </div>
+                    <div className="space-y-4 text-sm">
+                      <div className="p-3 bg-white rounded-lg border border-blue-200">
+                        <p className="font-semibold text-blue-800">"Schedule a marketing meeting for tomorrow"</p>
+                        <p className="text-gray-600 mt-1">→ Maya Creative will check calendars and send options</p>
+                      </div>
+                      <div className="p-3 bg-white rounded-lg border border-blue-200">
+                        <p className="font-semibold text-blue-800">"Analyze our Q4 financials URGENT"</p>
+                        <p className="text-gray-600 mt-1">→ Felix Finance will prioritize and send analysis</p>
+                      </div>
+                      <div className="p-3 bg-white rounded-lg border border-blue-200">
+                        <p className="font-semibold text-blue-800">"Need legal review of contract"</p>
+                        <p className="text-gray-600 mt-1">→ Lex Legal will request document and provide review</p>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+
+                <SMSSettings />
+              </div>
             </TabsContent>
           </Tabs>
         </div>
