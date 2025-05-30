@@ -16,6 +16,28 @@ interface AdvancedCapabilities {
   trelloIntegration: boolean;
 }
 
+// Enhanced response types
+interface SuccessResponse {
+  success: true;
+  data: any;
+  error?: never;
+}
+
+interface ErrorResponse {
+  success: false;
+  data?: any;
+  error: string;
+}
+
+interface PendingResponse {
+  success: false;
+  pending: true;
+  requestId: any;
+  message: string;
+}
+
+type ApiResponse = SuccessResponse | ErrorResponse | PendingResponse;
+
 class AgentCommunicationService {
   private agents: Map<string, Agent> = new Map();
   private messages: AgentMessage[] = [];
@@ -36,12 +58,25 @@ class AgentCommunicationService {
     trelloIntegration: true
   };
 
+  // Type guard functions
+  private isSuccessResponse(response: ApiResponse): response is SuccessResponse {
+    return response.success === true && 'data' in response;
+  }
+
+  private isPendingResponse(response: ApiResponse): response is PendingResponse {
+    return 'pending' in response && response.pending === true;
+  }
+
+  private isErrorResponse(response: ApiResponse): response is ErrorResponse {
+    return response.success === false && !('pending' in response);
+  }
+
   // Enhanced error handling wrapper for all external API calls
   private async withErrorHandling<T>(
     operation: () => Promise<T>,
     operationName: string,
     agentId?: string
-  ): Promise<{ success: boolean; data?: T; error?: string }> {
+  ): Promise<ApiResponse> {
     try {
       const result = await operation();
       console.log(`✅ ${operationName} completed successfully${agentId ? ` by ${this.getAgentDisplayName(agentId)}` : ''}`);
@@ -56,8 +91,7 @@ class AgentCommunicationService {
       return { 
         success: false, 
         error: errorMessage,
-        // Provide user-friendly error messages
-        data: this.getFallbackResponse(operationName) as T
+        data: this.getFallbackResponse(operationName)
       };
     }
   }
@@ -168,7 +202,7 @@ class AgentCommunicationService {
   }
 
   // Enhanced communication capabilities with error handling
-  async sendEmail(agentId: string, recipient: string, subject: string, body: string) {
+  async sendEmail(agentId: string, recipient: string, subject: string, body: string): Promise<ApiResponse> {
     if (this.requiresExecutivePermission('send_email', agentId, { recipient, subject })) {
       return this.requestPermissionAndQueue('send_email', agentId, 'Send Email', 
         `Send email to ${recipient}: ${subject}`, 'high',
@@ -187,7 +221,7 @@ class AgentCommunicationService {
     }, 'Send Email', agentId);
   }
 
-  async sendSMS(agentId: string, phoneNumber: string, message: string) {
+  async sendSMS(agentId: string, phoneNumber: string, message: string): Promise<ApiResponse> {
     if (this.requiresExecutivePermission('send_sms', agentId, { phoneNumber, message })) {
       return this.requestPermissionAndQueue('send_sms', agentId, 'Send SMS', 
         `Send SMS to ${phoneNumber}: ${message.substring(0, 50)}...`, 'medium',
@@ -211,7 +245,7 @@ class AgentCommunicationService {
     }, 'Send SMS', agentId);
   }
 
-  async initiatePhoneCall(agentId: string, phoneNumber: string, purpose: string, message: string) {
+  async initiatePhoneCall(agentId: string, phoneNumber: string, purpose: string, message: string): Promise<ApiResponse> {
     if (this.requiresExecutivePermission('make_phone_call', agentId, { phoneNumber, purpose })) {
       return this.requestPermissionAndQueue('make_phone_call', agentId, 'Initiate Phone Call', 
         `Call ${phoneNumber} for: ${purpose}`, 'high',
@@ -230,7 +264,7 @@ class AgentCommunicationService {
     }, 'Phone Call', agentId);
   }
 
-  async browseWeb(agentId: string, query: string, purpose: string, searchType = 'general') {
+  async browseWeb(agentId: string, query: string, purpose: string, searchType = 'general'): Promise<ApiResponse> {
     return await this.withErrorHandling(async () => {
       const { data, error } = await supabase.functions.invoke('web-research', {
         body: { agentId, query, purpose, searchType }
@@ -264,7 +298,7 @@ class AgentCommunicationService {
     }
   }
 
-  async generateFinancialModel(agentId: string, analysisType: string, parameters: any) {
+  async generateFinancialModel(agentId: string, analysisType: string, parameters: any): Promise<ApiResponse> {
     const amount = parameters?.budgetImpact || 0;
     if (this.requiresExecutivePermission('financial_analysis', agentId, { amount, analysisType })) {
       return this.requestPermissionAndQueue('financial_analysis', agentId, 'Financial Analysis', 
@@ -504,7 +538,7 @@ class AgentCommunicationService {
     description: string, 
     priority: 'low' | 'medium' | 'high' | 'critical',
     queuedAction: any
-  ) {
+  ): PendingResponse {
     const { permissionService } = require('./permissionService');
     const agentName = this.getAgentDisplayName(agentId);
     
@@ -528,7 +562,7 @@ class AgentCommunicationService {
   }
 
   // Google Classroom Integration with error handling
-  async updateGoogleClassroom(agentId: string, action: string, courseId?: string, data?: any) {
+  async updateGoogleClassroom(agentId: string, action: string, courseId?: string, data?: any): Promise<ApiResponse> {
     if (this.requiresExecutivePermission('google_classroom', agentId, { action, courseId })) {
       return this.requestPermissionAndQueue('google_classroom', agentId, 'Google Classroom Update', 
         `${action} in Google Classroom${courseId ? ` for course ${courseId}` : ''}`, 'medium',
@@ -548,7 +582,7 @@ class AgentCommunicationService {
   }
 
   // Trello Integration with error handling
-  async updateTrelloBoard(agentId: string, action: string, boardId?: string, listId?: string, cardId?: string, data?: any) {
+  async updateTrelloBoard(agentId: string, action: string, boardId?: string, listId?: string, cardId?: string, data?: any): Promise<ApiResponse> {
     if (this.requiresExecutivePermission('trello_integration', agentId, { action, boardId })) {
       return this.requestPermissionAndQueue('trello_integration', agentId, 'Trello Update', 
         `${action} in Trello${boardId ? ` for board ${boardId}` : ''}`, 'medium',
@@ -574,8 +608,8 @@ class AgentCommunicationService {
     }, 'Trello Integration', agentId);
   }
 
-  // Enhanced nonprofit-specific methods
-  async createGrantTrackingBoard(agentId: string, grantName: string) {
+  // Enhanced nonprofit-specific methods with proper type checking
+  async createGrantTrackingBoard(agentId: string, grantName: string): Promise<ApiResponse> {
     const boardData = {
       name: `Grant: ${grantName}`,
       description: `Grant application tracking and management for ${grantName}`
@@ -583,7 +617,7 @@ class AgentCommunicationService {
 
     const board = await this.updateTrelloBoard(agentId, 'createBoard', undefined, undefined, undefined, boardData);
     
-    if (board.success && board.data) {
+    if (this.isSuccessResponse(board) && board.data) {
       // Create standard grant tracking lists
       const lists = [
         'Research & Planning',
@@ -603,7 +637,7 @@ class AgentCommunicationService {
     return board;
   }
 
-  async createEducationalCourse(agentId: string, courseName: string, description: string) {
+  async createEducationalCourse(agentId: string, courseName: string, description: string): Promise<ApiResponse> {
     const courseData = {
       name: courseName,
       description: description
@@ -612,7 +646,7 @@ class AgentCommunicationService {
     return await this.updateGoogleClassroom(agentId, 'createCourse', undefined, courseData);
   }
 
-  async postGrantUpdateAnnouncement(agentId: string, courseId: string, grantStatus: string, details: string) {
+  async postGrantUpdateAnnouncement(agentId: string, courseId: string, grantStatus: string, details: string): Promise<ApiResponse> {
     const announcementData = {
       text: `Grant Update: ${grantStatus}\n\n${details}\n\nPosted by AI Agent: ${this.getAgentDisplayName(agentId)}`
     };

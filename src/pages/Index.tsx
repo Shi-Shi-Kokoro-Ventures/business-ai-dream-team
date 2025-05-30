@@ -1,449 +1,334 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { MainLayout } from '@/components/MainLayout';
 import EnhancedAgentCard from '@/components/EnhancedAgentCard';
-import ChatInterface from '@/components/ChatInterface';
-import AutonomousAgentMonitor from '@/components/AutonomousAgentMonitor';
-import ExecutiveDashboard from '@/components/ExecutiveDashboard';
-import { 
-  Brain, 
-  TrendingUp, 
-  DollarSign, 
-  Settings, 
-  Users, 
-  Target,
-  Sparkles,
-  Bot,
-  BarChart3,
-  Activity,
-  Scale,
-  Code,
-  Database,
-  Search,
-  Phone,
-  FileText,
-  Shield,
-  Crown,
-  Filter,
-  Grid3X3,
-  List,
-  Award,
-  Handshake,
-  Heart,
-  Megaphone,
-  Zap,
-  Star,
-  Clock
-} from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import EnterpriseMetrics from '@/components/EnterpriseMetrics';
+import AICapabilitiesShowcase from '@/components/AICapabilitiesShowcase';
 import { Card } from '@/components/ui/card';
-import { Agent } from '@/types/agent';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Sparkles,
+  Users,
+  TrendingUp,
+  Shield,
+  Zap,
+  Globe,
+  Brain,
+  Target,
+  MessageSquare,
+  Settings,
+  BarChart3,
+  FileText,
+  Phone,
+  Mail,
+  Calendar,
+  DollarSign,
+  Award,
+  Lightbulb,
+  Briefcase,
+  Scale,
+  Database,
+  Code,
+  PieChart,
+  Search,
+  BookOpen,
+  Megaphone
+} from 'lucide-react';
+import { agentCommunication } from '@/services/agentCommunication';
 
 const Index = () => {
-  const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
-  const [showMonitor, setShowMonitor] = useState(false);
-  const [showExecutiveDashboard, setShowExecutiveDashboard] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [filterCategory, setFilterCategory] = useState('all');
+  const [connectedAgents, setConnectedAgents] = useState(18);
+  const [totalTasks] = useState(247);
+  const [systemHealth] = useState(99.97);
 
-  const agents: Agent[] = [
+  const handleAgentClick = (agentId: string) => {
+    console.log(`Connecting to agent: ${agentId}`);
+    // In a real implementation, this would open a chat interface or agent interaction panel
+  };
+
+  useEffect(() => {
+    // Simulate real-time updates
+    const interval = setInterval(() => {
+      setConnectedAgents(prev => prev + Math.floor(Math.random() * 3) - 1);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const agents = [
     {
       id: 'executive-eva',
       name: 'Executive Eva',
-      role: 'Executive Assistant & Permission Manager',
-      description: 'Your elite personal AI executive assistant managing permissions, monitoring all agents, and ensuring you maintain complete control over critical business decisions.',
-      capabilities: ['Permission Management', 'Executive Reporting', 'Crisis Escalation', 'Multi-channel Contact', 'Security Oversight', 'Real-time Monitoring'],
-      icon: <Crown className="w-6 h-6" />,
-      color: 'from-purple-600 to-indigo-700',
-      isActive: true,
-      lastActivity: new Date()
+      role: 'Chief Executive Officer',
+      description: 'Strategic leadership and executive decision-making with comprehensive business oversight and autonomous operations management.',
+      capabilities: ['Strategic Planning', 'Executive Decisions', 'Board Relations', 'Vision Setting'],
+      icon: <Award className="w-8 h-8" />,
+      color: 'from-purple-600 to-pink-600'
     },
     {
       id: 'strategy',
       name: 'Alex Strategy',
-      role: 'Strategic Planning & Analytics Expert',
-      description: 'Elite strategic mind analyzing market trends, competitive intelligence, and providing data-driven strategic recommendations for exponential business growth.',
-      capabilities: ['Market Analysis', 'Competitive Intelligence', 'Growth Strategy', 'KPI Tracking', 'Risk Assessment', 'Predictive Analytics'],
-      icon: <Brain className="w-6 h-6" />,
-      color: 'from-purple-500 to-purple-600',
-      isActive: true,
-      lastActivity: new Date()
+      role: 'Strategic Planner',
+      description: 'Develops comprehensive business strategies, market analysis, and long-term planning with AI-powered insights and competitive intelligence.',
+      capabilities: ['Market Analysis', 'Strategic Planning', 'Competitive Intelligence', 'Business Development'],
+      icon: <Target className="w-8 h-8" />,
+      color: 'from-blue-600 to-cyan-600'
     },
     {
       id: 'marketing',
       name: 'Maya Creative',
-      role: 'Marketing & Content Specialist',
-      description: 'Creative marketing genius crafting viral campaigns, compelling content strategies, and revolutionary brand messaging to dominate your market presence.',
-      capabilities: ['Content Creation', 'Social Media', 'SEO Optimization', 'Brand Strategy', 'Campaign Management', 'Viral Marketing'],
-      icon: <TrendingUp className="w-6 h-6" />,
-      color: 'from-pink-500 to-rose-600',
-      isActive: true,
-      lastActivity: new Date()
+      role: 'Marketing Director',
+      description: 'Creates compelling marketing campaigns, brand strategies, and customer engagement initiatives with creative AI assistance.',
+      capabilities: ['Campaign Management', 'Brand Strategy', 'Content Creation', 'Social Media'],
+      icon: <Megaphone className="w-8 h-8" />,
+      color: 'from-pink-600 to-rose-600'
     },
     {
       id: 'finance',
       name: 'Felix Finance',
-      role: 'Financial Management Advisor',
-      description: 'Financial wizard managing budgets, forecasts, and financial planning to optimize profitability, cash flow, and investment strategies with precision.',
-      capabilities: ['Budget Planning', 'Financial Forecasting', 'Cost Analysis', 'Investment Advice', 'Tax Optimization', 'Profit Maximization'],
-      icon: <DollarSign className="w-6 h-6" />,
-      color: 'from-green-500 to-emerald-600',
-      isActive: true,
-      lastActivity: new Date()
+      role: 'Chief Financial Officer',
+      description: 'Manages financial planning, budgeting, investment strategies, and fiscal analysis with advanced AI modeling capabilities.',
+      capabilities: ['Financial Modeling', 'Budget Planning', 'Investment Analysis', 'Risk Management'],
+      icon: <DollarSign className="w-8 h-8" />,
+      color: 'from-green-600 to-emerald-600'
     },
     {
       id: 'operations',
       name: 'Oliver Operations',
-      role: 'Operations & Productivity Manager',
-      description: 'Operations mastermind streamlining processes, automating workflows, and optimizing operational efficiency to achieve maximum productivity.',
-      capabilities: ['Process Optimization', 'Automation', 'Quality Control', 'Supply Chain', 'Productivity Tools', 'Workflow Design'],
-      icon: <Settings className="w-6 h-6" />,
-      color: 'from-blue-500 to-cyan-600',
-      isActive: true,
-      lastActivity: new Date()
+      role: 'Operations Manager',
+      description: 'Optimizes business processes, supply chain management, and operational efficiency with intelligent automation systems.',
+      capabilities: ['Process Optimization', 'Supply Chain', 'Quality Control', 'Efficiency Analysis'],
+      icon: <Settings className="w-8 h-8" />,
+      color: 'from-indigo-600 to-purple-600'
     },
     {
       id: 'customer',
       name: 'Clara Customer',
-      role: 'Customer Relations Specialist',
-      description: 'Customer experience virtuoso enhancing satisfaction, managing relationships, and developing strategies to maximize retention and loyalty.',
-      capabilities: ['Customer Service', 'Relationship Management', 'Feedback Analysis', 'Retention Strategy', 'Support Systems', 'Experience Design'],
-      icon: <Users className="w-6 h-6" />,
-      color: 'from-orange-500 to-amber-600',
-      isActive: true,
-      lastActivity: new Date()
+      role: 'Customer Success Manager',
+      description: 'Ensures exceptional customer experiences, manages relationships, and drives customer satisfaction with personalized AI insights.',
+      capabilities: ['Customer Relations', 'Success Planning', 'Feedback Analysis', 'Retention Strategies'],
+      icon: <Users className="w-8 h-8" />,
+      color: 'from-orange-600 to-red-600'
     },
     {
       id: 'hr',
       name: 'Harper HR',
-      role: 'HR & Team Development Coach',
-      description: 'Team development expert focusing on talent optimization, performance enhancement, and creating exceptional workplace culture for peak productivity.',
-      capabilities: ['Team Building', 'Performance Management', 'Recruitment', 'Training Programs', 'Culture Development', 'Talent Optimization'],
-      icon: <Target className="w-6 h-6" />,
-      color: 'from-indigo-500 to-purple-600',
-      isActive: true,
-      lastActivity: new Date()
+      role: 'Human Resources Director',
+      description: 'Manages talent acquisition, employee development, and organizational culture with AI-driven people analytics.',
+      capabilities: ['Talent Management', 'Employee Development', 'Culture Building', 'Performance Analysis'],
+      icon: <Users className="w-8 h-8" />,
+      color: 'from-teal-600 to-cyan-600'
     },
     {
       id: 'legal',
       name: 'Lex Legal',
-      role: 'Chief Legal Officer',
-      description: 'Elite legal strategist handling compliance, contract management, intellectual property, and providing comprehensive legal advisory services.',
-      capabilities: ['Contract Management', 'Compliance Monitoring', 'IP Protection', 'Legal Strategy', 'Risk Mitigation', 'Regulatory Affairs'],
-      icon: <Scale className="w-6 h-6" />,
-      color: 'from-gray-700 to-gray-800',
-      isActive: true,
-      lastActivity: new Date()
+      role: 'Legal Counsel',
+      description: 'Provides legal guidance, contract analysis, compliance monitoring, and risk assessment with intelligent legal research.',
+      capabilities: ['Contract Analysis', 'Compliance', 'Legal Research', 'Risk Assessment'],
+      icon: <Scale className="w-8 h-8" />,
+      color: 'from-gray-700 to-slate-600'
     },
     {
       id: 'cto',
       name: 'Code Commander',
       role: 'Chief Technology Officer',
-      description: 'Technology visionary leading full-stack development, DevOps, cybersecurity, and digital transformation initiatives with cutting-edge solutions.',
-      capabilities: ['Full-Stack Development', 'DevOps', 'Cybersecurity', 'API Integration', 'Cloud Architecture', 'Tech Strategy'],
-      icon: <Code className="w-6 h-6" />,
-      color: 'from-emerald-500 to-teal-600',
-      isActive: true,
-      lastActivity: new Date()
+      description: 'Leads technology strategy, development initiatives, and digital transformation with advanced coding and architecture expertise.',
+      capabilities: ['Tech Strategy', 'Development', 'Architecture', 'Innovation'],
+      icon: <Code className="w-8 h-8" />,
+      color: 'from-violet-600 to-indigo-600'
     },
     {
       id: 'data',
       name: 'Dr. Data',
-      role: 'Chief Data Scientist',
-      description: 'Data science expert leveraging AI/ML, big data analytics, and predictive modeling to unlock powerful business insights and opportunities.',
-      capabilities: ['AI/ML Development', 'Big Data Analytics', 'Predictive Modeling', 'Data Visualization', 'Statistical Analysis', 'Business Intelligence'],
-      icon: <Database className="w-6 h-6" />,
-      color: 'from-violet-500 to-purple-600',
-      isActive: true,
-      lastActivity: new Date()
+      role: 'Data Scientist',
+      description: 'Extracts insights from complex datasets, builds predictive models, and drives data-driven decision making with advanced analytics.',
+      capabilities: ['Data Analysis', 'Machine Learning', 'Predictive Modeling', 'Business Intelligence'],
+      icon: <BarChart3 className="w-8 h-8" />,
+      color: 'from-emerald-600 to-teal-600'
     },
     {
       id: 'intelligence',
       name: 'Intel Investigator',
-      role: 'Business Intelligence & Research Specialist',
-      description: 'Intelligence expert conducting web research, competitive analysis, and market investigation to provide actionable business insights.',
-      capabilities: ['Web Research', 'Competitive Analysis', 'Market Intelligence', 'Data Mining', 'Trend Analysis', 'OSINT'],
-      icon: <Search className="w-6 h-6" />,
-      color: 'from-cyan-500 to-blue-600',
-      isActive: true,
-      lastActivity: new Date()
+      role: 'Business Intelligence Analyst',
+      description: 'Gathers market intelligence, competitive analysis, and strategic insights with comprehensive research capabilities.',
+      capabilities: ['Market Research', 'Competitive Analysis', 'Trend Analysis', 'Intelligence Gathering'],
+      icon: <Search className="w-8 h-8" />,
+      color: 'from-amber-600 to-orange-600'
     },
     {
       id: 'communications',
       name: 'Comm Chief',
       role: 'Communications Director',
-      description: 'Communications specialist managing email campaigns, SMS marketing, phone operations, and multi-channel communication strategies.',
-      capabilities: ['Email Automation', 'SMS Campaigns', 'Phone Management', 'Social Media', 'Communication Strategy', 'Channel Optimization'],
-      icon: <Phone className="w-6 h-6" />,
-      color: 'from-rose-500 to-pink-600',
-      isActive: true,
-      lastActivity: new Date()
+      description: 'Manages internal and external communications, public relations, and stakeholder engagement with strategic messaging.',
+      capabilities: ['Public Relations', 'Internal Comms', 'Crisis Management', 'Stakeholder Relations'],
+      icon: <MessageSquare className="w-8 h-8" />,
+      color: 'from-blue-600 to-indigo-600'
     },
     {
       id: 'documents',
       name: 'Doc Master',
-      role: 'Document & Content Management Specialist',
-      description: 'Document expert creating reports, contracts, presentations, spreadsheets, and managing comprehensive content automation systems.',
-      capabilities: ['Document Creation', 'Report Generation', 'Template Design', 'Spreadsheet Management', 'Content Automation', 'File Organization'],
-      icon: <FileText className="w-6 h-6" />,
-      color: 'from-amber-500 to-orange-600',
-      isActive: true,
-      lastActivity: new Date()
+      role: 'Document Manager',
+      description: 'Manages document workflows, knowledge bases, and information systems with intelligent organization and retrieval.',
+      capabilities: ['Document Management', 'Knowledge Base', 'Information Systems', 'Content Organization'],
+      icon: <FileText className="w-8 h-8" />,
+      color: 'from-slate-600 to-gray-600'
     },
     {
       id: 'grant-expert',
       name: 'Dr. Grant Sterling',
-      role: 'Senior Grant Writing Specialist',
-      description: 'Elite grant writing expert specializing in federal grants, foundation funding, and research proposals with guaranteed approval strategies and compliance mastery.',
-      capabilities: ['Federal Grants', 'State Funding', 'Foundation Grants', 'NIH/NSF Proposals', 'Compliance Review', 'Budget Analysis', 'Narrative Development', 'Success Rate Optimization'],
-      icon: <Award className="w-6 h-6" />,
-      color: 'from-yellow-500 to-amber-600',
-      isActive: true,
-      lastActivity: new Date()
+      role: 'Grant Writing Expert',
+      description: 'Specializes in grant research, application writing, and funding strategies with comprehensive grant management capabilities.',
+      capabilities: ['Grant Writing', 'Funding Research', 'Application Management', 'Compliance Tracking'],
+      icon: <BookOpen className="w-8 h-8" />,
+      color: 'from-emerald-600 to-green-600'
     },
     {
       id: 'government-contracts',
       name: 'Agent Samuel Contracts',
-      role: 'Government Procurement Specialist',
-      description: 'Government contracting master navigating federal procurement processes, GSA schedules, and RFP responses with expert compliance and winning strategies.',
-      capabilities: ['Federal Contracting', 'GSA Schedules', 'RFP Responses', 'Compliance Auditing', 'Vendor Registration', 'Contract Negotiation', 'Procurement Strategy', 'Government Relations'],
-      icon: <Shield className="w-6 h-6" />,
-      color: 'from-blue-700 to-blue-900',
-      isActive: true,
-      lastActivity: new Date()
+      role: 'Government Contracts Specialist',
+      description: 'Expert in government contracting, procurement processes, and regulatory compliance with specialized federal knowledge.',
+      capabilities: ['Government Contracting', 'Procurement', 'Regulatory Compliance', 'Federal Relations'],
+      icon: <Briefcase className="w-8 h-8" />,
+      color: 'from-red-600 to-pink-600'
     },
     {
       id: 'chief-strategy',
       name: 'Victoria Sterling',
-      role: 'Chief Strategy Officer & Legal Innovation Expert',
-      description: 'Strategic mastermind specializing in legal loophole identification, creative compliance solutions, and innovative business strategies that maximize success within legal frameworks.',
-      capabilities: ['Legal Loophole Analysis', 'Regulatory Navigation', 'Creative Compliance', 'Strategic Positioning', 'Risk Mitigation', 'Innovation Strategy', 'Competitive Advantage', 'Legal Innovation'],
-      icon: <Crown className="w-6 h-6" />,
-      color: 'from-purple-600 to-violet-700',
-      isActive: true,
-      lastActivity: new Date()
+      role: 'Chief Strategy Officer',
+      description: 'Develops enterprise-level strategic initiatives, market positioning, and growth strategies with executive-level decision making.',
+      capabilities: ['Enterprise Strategy', 'Market Positioning', 'Growth Planning', 'Strategic Partnerships'],
+      icon: <Lightbulb className="w-8 h-8" />,
+      color: 'from-purple-600 to-violet-600'
     },
     {
       id: 'negotiation-expert',
       name: 'Marcus Dealmaker',
-      role: 'Master Negotiator & Deal Architect',
-      description: 'Elite negotiation specialist creating win-win solutions, managing complex stakeholder relationships, and architecting deals that maximize value for all parties.',
-      capabilities: ['Contract Negotiation', 'Stakeholder Management', 'Win-Win Solutions', 'Conflict Resolution', 'Strategic Partnerships', 'Deal Architecture', 'Relationship Building', 'Value Optimization'],
-      icon: <Handshake className="w-6 h-6" />,
-      color: 'from-emerald-600 to-green-700',
-      isActive: true,
-      lastActivity: new Date()
+      role: 'Negotiation Expert',
+      description: 'Masters complex negotiations, deal structuring, and relationship management with advanced persuasion and analytical skills.',
+      capabilities: ['Contract Negotiation', 'Deal Structuring', 'Relationship Building', 'Conflict Resolution'],
+      icon: <Users className="w-8 h-8" />,
+      color: 'from-orange-600 to-amber-600'
     },
     {
       id: 'digital-fundraising',
       name: 'Diana Digital',
-      role: 'Digital Marketing & Fundraising Expert',
-      description: 'Nonprofit digital marketing specialist driving fundraising success through innovative campaigns, donor acquisition, and multi-channel digital strategies that maximize impact.',
-      capabilities: ['Digital Campaigns', 'Donor Acquisition', 'Crowdfunding', 'Social Media Fundraising', 'Grant Marketing', 'Email Fundraising', 'Nonprofit Marketing', 'Campaign Optimization'],
-      icon: <Heart className="w-6 h-6" />,
-      color: 'from-coral-500 to-red-600',
-      isActive: true,
-      lastActivity: new Date()
+      role: 'Digital Fundraising Expert',
+      description: 'Specializes in online fundraising, crowdfunding campaigns, and digital marketing for nonprofit organizations.',
+      capabilities: ['Digital Campaigns', 'Crowdfunding', 'Donor Relations', 'Online Marketing'],
+      icon: <Globe className="w-8 h-8" />,
+      color: 'from-cyan-600 to-blue-600'
     }
   ];
 
-  const handleAgentClick = (agent: Agent) => {
-    if (agent.id === 'executive-eva') {
-      setShowExecutiveDashboard(true);
-    } else {
-      setSelectedAgent(agent);
-    }
-  };
-
-  const handleQuickAction = (action: string) => {
-    if (action === 'executive') {
-      setShowExecutiveDashboard(true);
-    } else if (action === 'monitor') {
-      setShowMonitor(true);
-    }
-  };
-
-  const filteredAgents = agents.filter(agent =>
-    agent.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    agent.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    agent.capabilities.some(cap => cap.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
-
-  if (selectedAgent) {
-    return <ChatInterface agent={selectedAgent} onBack={() => setSelectedAgent(null)} />;
-  }
-
-  if (showMonitor) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Elite Autonomous Agent Network</h1>
-          <Button onClick={() => setShowMonitor(false)} variant="outline">
-            Back to Dashboard
-          </Button>
-        </div>
-        <AutonomousAgentMonitor agents={agents} />
-      </div>
-    );
-  }
-
-  if (showExecutiveDashboard) {
-    return <ExecutiveDashboard onBack={() => setShowExecutiveDashboard(false)} />;
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/80 to-indigo-100/60">
-      <div className="container mx-auto px-8 py-12">
-        {/* Enhanced Header with Glassmorphism */}
-        <div className="mb-16">
-          <div className="flex items-center gap-6 mb-8">
-            <div className="relative">
-              <div className="p-6 rounded-3xl bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white shadow-2xl">
-                <Bot className="w-12 h-12" />
+    <MainLayout>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+        {/* Enhanced Header */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
+          
+          <div className="relative container mx-auto px-6 py-20">
+            <div className="text-center text-white">
+              <div className="flex items-center justify-center gap-4 mb-6">
+                <div className="p-4 bg-white/10 backdrop-blur-sm rounded-2xl">
+                  <Brain className="w-12 h-12 text-white" />
+                </div>
+                <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-white via-blue-200 to-purple-200 bg-clip-text text-transparent">
+                  Elite AI Business Team
+                </h1>
               </div>
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-400 rounded-3xl blur-xl opacity-50 animate-pulse" />
-            </div>
-            <div>
-              <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 bg-clip-text text-transparent leading-tight">
-                Elite AI Business Team
-              </h1>
-              <p className="text-xl text-gray-600 mt-4 font-medium">
-                18 autonomous AI specialists with executive control & oversight
+              
+              <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-4xl mx-auto leading-relaxed">
+                The world's most advanced autonomous AI business platform with 18 specialized agents working 24/7 to transform your enterprise operations
               </p>
-            </div>
-          </div>
+              
+              <div className="flex items-center justify-center gap-8 mb-8 text-sm">
+                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-green-200">{connectedAgents} Agents Online</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+                  <Zap className="w-4 h-4 text-yellow-400" />
+                  <span className="text-yellow-200">{totalTasks} Tasks Completed</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+                  <Shield className="w-4 h-4 text-blue-400" />
+                  <span className="text-blue-200">{systemHealth}% Uptime</span>
+                </div>
+              </div>
 
-          {/* Enhanced Stats Cards with Glassmorphism */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-            <Card className="p-8 bg-white/70 backdrop-blur-xl border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-2">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-4xl font-black text-blue-600 mb-2">18</div>
-                  <div className="text-blue-700 font-bold text-lg">Elite Specialists</div>
-                  <div className="text-sm text-blue-600 mt-1 flex items-center gap-1">
-                    <Star className="w-4 h-4 fill-current" />
-                    Premium Tier
-                  </div>
-                </div>
-                <Bot className="w-12 h-12 text-blue-500" />
+              <div className="flex items-center justify-center gap-4">
+                <Button className="bg-white text-indigo-900 hover:bg-blue-50 px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                  Experience the Future
+                </Button>
+                <Button variant="outline" className="border-white text-white hover:bg-white hover:text-indigo-900 px-8 py-4 text-lg font-semibold rounded-xl backdrop-blur-sm">
+                  Watch Demo
+                </Button>
               </div>
-            </Card>
-            <Card className="p-8 bg-white/70 backdrop-blur-xl border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-2">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-4xl font-black text-green-600 mb-2">24/7</div>
-                  <div className="text-green-700 font-bold text-lg">Active Operations</div>
-                  <div className="text-sm text-green-600 mt-1 flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    Always Available
-                  </div>
-                </div>
-                <Activity className="w-12 h-12 text-green-500" />
-              </div>
-            </Card>
-            <Card className="p-8 bg-white/70 backdrop-blur-xl border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-2">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-4xl font-black text-purple-600 mb-2">98%</div>
-                  <div className="text-purple-700 font-bold text-lg">Accuracy Rate</div>
-                  <div className="text-sm text-purple-600 mt-1 flex items-center gap-1">
-                    <Shield className="w-4 h-4" />
-                    Verified Quality
-                  </div>
-                </div>
-                <Shield className="w-12 h-12 text-purple-500" />
-              </div>
-            </Card>
-            <Card className="p-8 bg-white/70 backdrop-blur-xl border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-2">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-4xl font-black text-amber-600 mb-2">&lt; 2s</div>
-                  <div className="text-amber-700 font-bold text-lg">Response Time</div>
-                  <div className="text-sm text-amber-600 mt-1 flex items-center gap-1">
-                    <Zap className="w-4 h-4" />
-                    Lightning Fast
-                  </div>
-                </div>
-                <Zap className="w-12 h-12 text-amber-500" />
-              </div>
-            </Card>
-          </div>
-
-          {/* Enhanced Controls with Glassmorphism */}
-          <div className="flex flex-col md:flex-row gap-6 items-center justify-between mb-12 p-6 bg-white/60 backdrop-blur-xl rounded-3xl border border-white/20 shadow-xl">
-            <div className="flex items-center gap-6 flex-1">
-              <div className="relative flex-1 max-w-lg">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <Input
-                  placeholder="Search agents by name, role, or capabilities..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12 py-4 text-lg bg-white/80 backdrop-blur border-0 shadow-lg focus:shadow-xl rounded-2xl transition-all duration-300"
-                />
-              </div>
-              <Button variant="outline" size="lg" className="bg-white/80 backdrop-blur border-0 shadow-lg hover:shadow-xl rounded-2xl">
-                <Filter className="w-5 h-5 mr-2" />
-                Filter
-              </Button>
-            </div>
-            <div className="flex items-center gap-3">
-              <Button
-                variant={viewMode === 'grid' ? 'default' : 'outline'}
-                size="lg"
-                onClick={() => setViewMode('grid')}
-                className="bg-white/80 backdrop-blur border-0 shadow-lg hover:shadow-xl rounded-2xl"
-              >
-                <Grid3X3 className="w-5 h-5" />
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'outline'}
-                size="lg"
-                onClick={() => setViewMode('list')}
-                className="bg-white/80 backdrop-blur border-0 shadow-lg hover:shadow-xl rounded-2xl"
-              >
-                <List className="w-5 h-5" />
-              </Button>
             </div>
           </div>
         </div>
 
-        {/* Enhanced Agent Grid */}
-        <div className={viewMode === 'grid' 
-          ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" 
-          : "space-y-6"
-        }>
-          {filteredAgents.map((agent) => (
-            <EnhancedAgentCard
-              key={agent.id}
-              name={agent.name}
-              role={agent.role}
-              description={agent.description}
-              capabilities={agent.capabilities}
-              icon={agent.icon}
-              color={agent.color}
-              onClick={() => handleAgentClick(agent)}
-            />
-          ))}
-        </div>
+        <div className="container mx-auto px-6 py-12">
+          <Tabs defaultValue="agents" className="space-y-8">
+            <TabsList className="grid w-full grid-cols-4 bg-white/80 backdrop-blur-sm border border-white/20 shadow-lg rounded-2xl p-2">
+              <TabsTrigger value="agents" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-xl py-3 font-semibold transition-all duration-300">
+                AI Agents
+              </TabsTrigger>
+              <TabsTrigger value="capabilities" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-xl py-3 font-semibold transition-all duration-300">
+                Capabilities
+              </TabsTrigger>
+              <TabsTrigger value="enterprise" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-xl py-3 font-semibold transition-all duration-300">
+                Enterprise
+              </TabsTrigger>
+              <TabsTrigger value="comparison" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-xl py-3 font-semibold transition-all duration-300">
+                vs Salesforce
+              </TabsTrigger>
+            </TabsList>
 
-        {/* Enhanced Footer with Glassmorphism */}
-        <div className="text-center mt-20 p-12 bg-white/60 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl">
-          <h3 className="text-4xl font-black text-gray-900 mb-6">Executive-Controlled AI Business Network</h3>
-          <p className="text-gray-700 mb-8 max-w-5xl mx-auto text-xl leading-relaxed">
-            Your elite AI team operates under complete executive control with secure, autonomous capabilities, always under your authority.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <Badge variant="outline" className="border-purple-200 text-purple-700 px-4 py-3 text-sm font-semibold bg-purple-50/80 backdrop-blur">Executive Permission Management</Badge>
-            <Badge variant="outline" className="border-blue-200 text-blue-700 px-4 py-3 text-sm font-semibold bg-blue-50/80 backdrop-blur">Real-time Monitoring & Control</Badge>
-            <Badge variant="outline" className="border-green-200 text-green-700 px-4 py-3 text-sm font-semibold bg-green-50/80 backdrop-blur">Multi-Channel Executive Alerts</Badge>
-            <Badge variant="outline" className="border-amber-200 text-amber-700 px-4 py-3 text-sm font-semibold bg-amber-50/80 backdrop-blur">Crisis Escalation Protocols</Badge>
-            <Badge variant="outline" className="border-red-200 text-red-700 px-4 py-3 text-sm font-semibold bg-red-50/80 backdrop-blur">Grant & Contract Specialists</Badge>
-            <Badge variant="outline" className="border-emerald-200 text-emerald-700 px-4 py-3 text-sm font-semibold bg-emerald-50/80 backdrop-blur">Negotiation & Fundraising Experts</Badge>
-          </div>
+            <TabsContent value="agents" className="space-y-8">
+              <div className="text-center mb-12">
+                <h2 className="text-4xl font-bold text-gray-900 mb-4">Meet Your AI Business Team</h2>
+                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                  18 specialized AI agents, each with unique expertise and autonomous capabilities, working together to revolutionize your business operations
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {agents.map((agent) => (
+                  <EnhancedAgentCard
+                    key={agent.id}
+                    name={agent.name}
+                    role={agent.role}
+                    description={agent.description}
+                    capabilities={agent.capabilities}
+                    icon={agent.icon}
+                    color={agent.color}
+                    onClick={() => handleAgentClick(agent.id)}
+                    responseTime="< 2s"
+                    lastActivity="1 min ago"
+                    tasksCompleted={Math.floor(Math.random() * 100) + 20}
+                  />
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="capabilities">
+              <AICapabilitiesShowcase />
+            </TabsContent>
+
+            <TabsContent value="enterprise">
+              <EnterpriseMetrics />
+            </TabsContent>
+
+            <TabsContent value="comparison">
+              <EnterpriseMetrics />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
-    </div>
+    </MainLayout>
   );
 };
 
