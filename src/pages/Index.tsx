@@ -1,18 +1,21 @@
-
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/MainLayout';
 import EnhancedAgentCard from '@/components/EnhancedAgentCard';
 import EnterpriseMetrics from '@/components/EnterpriseMetrics';
 import AICapabilitiesShowcase from '@/components/AICapabilitiesShowcase';
 import SMSSettings from '@/components/SMSSettings';
+import ExecutiveDashboard from '@/components/ExecutiveDashboard';
+import ChatInterface from '@/components/ChatInterface';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { enhancedAiService } from '@/services/enhancedAiService';
+import { businessProcessService } from '@/services/businessProcessService';
+import { Agent } from '@/types/agent';
 import {
   Sparkles,
   Users,
-  TrendingUp,
   Shield,
   Zap,
   Globe,
@@ -23,28 +26,51 @@ import {
   BarChart3,
   FileText,
   Phone,
-  Mail,
-  Calendar,
   DollarSign,
   Award,
   Lightbulb,
   Briefcase,
   Scale,
-  Database,
   Code,
-  PieChart,
   Search,
   BookOpen,
-  Megaphone
+  Megaphone,
+  Crown
 } from 'lucide-react';
 
 const Index = () => {
   const [connectedAgents, setConnectedAgents] = useState(18);
   const [totalTasks] = useState(247);
   const [systemHealth] = useState(99.97);
+  const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
+  const [currentView, setCurrentView] = useState<'dashboard' | 'chat' | 'executive'>('dashboard');
 
-  const handleAgentClick = (agentId: string) => {
-    console.log(`Connecting to agent: ${agentId}`);
+  const handleAgentClick = async (agentId: string) => {
+    const agent = agents.find(a => a.id === agentId);
+    if (agent) {
+      setSelectedAgent({
+        ...agent,
+        isActive: true,
+        lastActivity: new Date()
+      });
+      setCurrentView('chat');
+      
+      // Log agent interaction
+      console.log(`Connecting to agent: ${agentId}`);
+      await enhancedAiService.processBusinessRequest(agentId, 
+        "User has initiated a chat session. Please provide a professional greeting and overview of your capabilities.",
+        { interactionType: 'chat_initiation' }
+      );
+    }
+  };
+
+  const handleExecutiveDashboard = () => {
+    setCurrentView('executive');
+  };
+
+  const handleBackToDashboard = () => {
+    setCurrentView('dashboard');
+    setSelectedAgent(null);
   };
 
   useEffect(() => {
@@ -220,6 +246,35 @@ const Index = () => {
     }
   ];
 
+  // Render different views based on currentView state
+  if (currentView === 'executive') {
+    return (
+      <MainLayout>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+          <div className="container mx-auto px-6 py-8">
+            <div className="flex items-center gap-4 mb-6">
+              <Button onClick={handleBackToDashboard} variant="outline" size="sm">
+                ← Back to Dashboard
+              </Button>
+              <div className="flex items-center gap-3">
+                <Crown className="w-8 h-8 text-purple-600" />
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">Executive Command Center</h1>
+                  <p className="text-gray-600">Real-time business intelligence and AI oversight</p>
+                </div>
+              </div>
+            </div>
+            <ExecutiveDashboard />
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (currentView === 'chat' && selectedAgent) {
+    return <ChatInterface agent={selectedAgent} onBack={handleBackToDashboard} />;
+  }
+
   return (
     <MainLayout>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -257,6 +312,10 @@ const Index = () => {
               </div>
 
               <div className="flex items-center justify-center gap-4">
+                <Button onClick={handleExecutiveDashboard} className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                  <Crown className="w-5 h-5 mr-2" />
+                  Executive Dashboard
+                </Button>
                 <Button className="bg-white text-indigo-900 hover:bg-blue-50 px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
                   Experience the Future
                 </Button>
