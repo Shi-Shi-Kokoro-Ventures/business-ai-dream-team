@@ -29,7 +29,9 @@ import {
   Handshake,
   Heart,
   Megaphone,
-  Zap
+  Zap,
+  Star,
+  Clock
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -189,7 +191,6 @@ const Index = () => {
       isActive: true,
       lastActivity: new Date()
     },
-    // NEW ELITE AGENTS
     {
       id: 'grant-expert',
       name: 'Dr. Grant Sterling',
@@ -292,128 +293,154 @@ const Index = () => {
   }
 
   return (
-    <div className="container mx-auto px-6 py-8">
-      {/* Enhanced Header with improved layout */}
-      <div className="mb-12">
-        <div className="flex items-center gap-4 mb-6">
-          <div className="p-4 rounded-3xl bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white shadow-2xl">
-            <Bot className="w-10 h-10" />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/80 to-indigo-100/60">
+      <div className="container mx-auto px-8 py-12">
+        {/* Enhanced Header with Glassmorphism */}
+        <div className="mb-16">
+          <div className="flex items-center gap-6 mb-8">
+            <div className="relative">
+              <div className="p-6 rounded-3xl bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white shadow-2xl">
+                <Bot className="w-12 h-12" />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-400 rounded-3xl blur-xl opacity-50 animate-pulse" />
+            </div>
+            <div>
+              <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 bg-clip-text text-transparent leading-tight">
+                Elite AI Business Team
+              </h1>
+              <p className="text-xl text-gray-600 mt-4 font-medium">
+                18 autonomous AI specialists with executive control & oversight
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 bg-clip-text text-transparent">
-              Elite AI Business Team
-            </h1>
-            <p className="text-lg text-gray-600 mt-2">
-              18 autonomous AI specialists with executive control & oversight
-            </p>
+
+          {/* Enhanced Stats Cards with Glassmorphism */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+            <Card className="p-8 bg-white/70 backdrop-blur-xl border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-4xl font-black text-blue-600 mb-2">18</div>
+                  <div className="text-blue-700 font-bold text-lg">Elite Specialists</div>
+                  <div className="text-sm text-blue-600 mt-1 flex items-center gap-1">
+                    <Star className="w-4 h-4 fill-current" />
+                    Premium Tier
+                  </div>
+                </div>
+                <Bot className="w-12 h-12 text-blue-500" />
+              </div>
+            </Card>
+            <Card className="p-8 bg-white/70 backdrop-blur-xl border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-4xl font-black text-green-600 mb-2">24/7</div>
+                  <div className="text-green-700 font-bold text-lg">Active Operations</div>
+                  <div className="text-sm text-green-600 mt-1 flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    Always Available
+                  </div>
+                </div>
+                <Activity className="w-12 h-12 text-green-500" />
+              </div>
+            </Card>
+            <Card className="p-8 bg-white/70 backdrop-blur-xl border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-4xl font-black text-purple-600 mb-2">98%</div>
+                  <div className="text-purple-700 font-bold text-lg">Accuracy Rate</div>
+                  <div className="text-sm text-purple-600 mt-1 flex items-center gap-1">
+                    <Shield className="w-4 h-4" />
+                    Verified Quality
+                  </div>
+                </div>
+                <Shield className="w-12 h-12 text-purple-500" />
+              </div>
+            </Card>
+            <Card className="p-8 bg-white/70 backdrop-blur-xl border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-4xl font-black text-amber-600 mb-2">&lt; 2s</div>
+                  <div className="text-amber-700 font-bold text-lg">Response Time</div>
+                  <div className="text-sm text-amber-600 mt-1 flex items-center gap-1">
+                    <Zap className="w-4 h-4" />
+                    Lightning Fast
+                  </div>
+                </div>
+                <Zap className="w-12 h-12 text-amber-500" />
+              </div>
+            </Card>
+          </div>
+
+          {/* Enhanced Controls with Glassmorphism */}
+          <div className="flex flex-col md:flex-row gap-6 items-center justify-between mb-12 p-6 bg-white/60 backdrop-blur-xl rounded-3xl border border-white/20 shadow-xl">
+            <div className="flex items-center gap-6 flex-1">
+              <div className="relative flex-1 max-w-lg">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Input
+                  placeholder="Search agents by name, role, or capabilities..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-12 py-4 text-lg bg-white/80 backdrop-blur border-0 shadow-lg focus:shadow-xl rounded-2xl transition-all duration-300"
+                />
+              </div>
+              <Button variant="outline" size="lg" className="bg-white/80 backdrop-blur border-0 shadow-lg hover:shadow-xl rounded-2xl">
+                <Filter className="w-5 h-5 mr-2" />
+                Filter
+              </Button>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'outline'}
+                size="lg"
+                onClick={() => setViewMode('grid')}
+                className="bg-white/80 backdrop-blur border-0 shadow-lg hover:shadow-xl rounded-2xl"
+              >
+                <Grid3X3 className="w-5 h-5" />
+              </Button>
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'outline'}
+                size="lg"
+                onClick={() => setViewMode('list')}
+                className="bg-white/80 backdrop-blur border-0 shadow-lg hover:shadow-xl rounded-2xl"
+              >
+                <List className="w-5 h-5" />
+              </Button>
+            </div>
           </div>
         </div>
 
-        {/* Enhanced Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-3xl font-bold text-blue-600">18</div>
-                <div className="text-blue-700 font-medium">Elite Specialists</div>
-              </div>
-              <Bot className="w-8 h-8 text-blue-500" />
-            </div>
-          </Card>
-          <Card className="p-6 bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-3xl font-bold text-green-600">24/7</div>
-                <div className="text-green-700 font-medium">Active Operations</div>
-              </div>
-              <Activity className="w-8 h-8 text-green-500" />
-            </div>
-          </Card>
-          <Card className="p-6 bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-3xl font-bold text-purple-600">98%</div>
-                <div className="text-purple-700 font-medium">Accuracy Rate</div>
-              </div>
-              <Shield className="w-8 h-8 text-purple-500" />
-            </div>
-          </Card>
-          <Card className="p-6 bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-3xl font-bold text-amber-600">&lt; 2s</div>
-                <div className="text-amber-700 font-medium">Response Time</div>
-              </div>
-              <Zap className="w-8 h-8 text-amber-500" />
-            </div>
-          </Card>
-        </div>
-
-        {/* Enhanced Controls */}
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-8">
-          <div className="flex items-center gap-4 flex-1">
-            <Input
-              placeholder="Search agents by name, role, or capabilities..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-md"
+        {/* Enhanced Agent Grid */}
+        <div className={viewMode === 'grid' 
+          ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" 
+          : "space-y-6"
+        }>
+          {filteredAgents.map((agent) => (
+            <EnhancedAgentCard
+              key={agent.id}
+              name={agent.name}
+              role={agent.role}
+              description={agent.description}
+              capabilities={agent.capabilities}
+              icon={agent.icon}
+              color={agent.color}
+              onClick={() => handleAgentClick(agent)}
             />
-            <Button variant="outline" size="sm">
-              <Filter className="w-4 h-4 mr-2" />
-              Filter
-            </Button>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant={viewMode === 'grid' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setViewMode('grid')}
-            >
-              <Grid3X3 className="w-4 h-4" />
-            </Button>
-            <Button
-              variant={viewMode === 'list' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setViewMode('list')}
-            >
-              <List className="w-4 h-4" />
-            </Button>
-          </div>
+          ))}
         </div>
-      </div>
 
-      {/* Enhanced Agent Grid */}
-      <div className={viewMode === 'grid' 
-        ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" 
-        : "space-y-4"
-      }>
-        {filteredAgents.map((agent) => (
-          <EnhancedAgentCard
-            key={agent.id}
-            name={agent.name}
-            role={agent.role}
-            description={agent.description}
-            capabilities={agent.capabilities}
-            icon={agent.icon}
-            color={agent.color}
-            onClick={() => handleAgentClick(agent)}
-          />
-        ))}
-      </div>
-
-      {/* Enhanced Footer */}
-      <div className="text-center mt-16 p-8 bg-gradient-to-r from-white/80 to-blue-50/80 backdrop-blur-sm rounded-3xl border border-white/20 shadow-xl">
-        <h3 className="text-3xl font-bold text-gray-900 mb-4">Executive-Controlled AI Business Network</h3>
-        <p className="text-gray-700 mb-6 max-w-4xl mx-auto text-lg leading-relaxed">
-          Your elite AI team operates under complete executive control with secure, autonomous capabilities, always under your authority.
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          <Badge variant="outline" className="border-purple-200 text-purple-700 px-3 py-2">Executive Permission Management</Badge>
-          <Badge variant="outline" className="border-blue-200 text-blue-700 px-3 py-2">Real-time Monitoring & Control</Badge>
-          <Badge variant="outline" className="border-green-200 text-green-700 px-3 py-2">Multi-Channel Executive Alerts</Badge>
-          <Badge variant="outline" className="border-amber-200 text-amber-700 px-3 py-2">Crisis Escalation Protocols</Badge>
-          <Badge variant="outline" className="border-red-200 text-red-700 px-3 py-2">Grant & Contract Specialists</Badge>
-          <Badge variant="outline" className="border-emerald-200 text-emerald-700 px-3 py-2">Negotiation & Fundraising Experts</Badge>
+        {/* Enhanced Footer with Glassmorphism */}
+        <div className="text-center mt-20 p-12 bg-white/60 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl">
+          <h3 className="text-4xl font-black text-gray-900 mb-6">Executive-Controlled AI Business Network</h3>
+          <p className="text-gray-700 mb-8 max-w-5xl mx-auto text-xl leading-relaxed">
+            Your elite AI team operates under complete executive control with secure, autonomous capabilities, always under your authority.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <Badge variant="outline" className="border-purple-200 text-purple-700 px-4 py-3 text-sm font-semibold bg-purple-50/80 backdrop-blur">Executive Permission Management</Badge>
+            <Badge variant="outline" className="border-blue-200 text-blue-700 px-4 py-3 text-sm font-semibold bg-blue-50/80 backdrop-blur">Real-time Monitoring & Control</Badge>
+            <Badge variant="outline" className="border-green-200 text-green-700 px-4 py-3 text-sm font-semibold bg-green-50/80 backdrop-blur">Multi-Channel Executive Alerts</Badge>
+            <Badge variant="outline" className="border-amber-200 text-amber-700 px-4 py-3 text-sm font-semibold bg-amber-50/80 backdrop-blur">Crisis Escalation Protocols</Badge>
+            <Badge variant="outline" className="border-red-200 text-red-700 px-4 py-3 text-sm font-semibold bg-red-50/80 backdrop-blur">Grant & Contract Specialists</Badge>
+            <Badge variant="outline" className="border-emerald-200 text-emerald-700 px-4 py-3 text-sm font-semibold bg-emerald-50/80 backdrop-blur">Negotiation & Fundraising Experts</Badge>
+          </div>
         </div>
       </div>
     </div>

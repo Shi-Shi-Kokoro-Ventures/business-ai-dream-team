@@ -22,6 +22,15 @@ interface FundraisingCampaign {
   classroomAnnouncementId?: string;
 }
 
+// Type guard functions
+function hasData(response: any): response is { success: boolean; data: any; error?: string } {
+  return response && typeof response === 'object' && 'data' in response;
+}
+
+function hasError(response: any): response is { success: boolean; data?: any; error: string } {
+  return response && typeof response === 'object' && 'error' in response;
+}
+
 class NonprofitIntegrationService {
   private grantProjects: Map<string, GrantProject> = new Map();
   private fundraisingCampaigns: Map<string, FundraisingCampaign> = new Map();
@@ -44,7 +53,7 @@ class NonprofitIntegrationService {
 
     // Create Trello board for grant tracking
     const board = await agentCommunication.createGrantTrackingBoard('grant-expert', grantName);
-    if (board.success && board.data) {
+    if (board.success && hasData(board) && board.data) {
       project.trelloBoardId = board.data.id;
     }
 
@@ -54,7 +63,7 @@ class NonprofitIntegrationService {
       `Grant Team: ${grantName}`,
       `Collaborative workspace for ${grantName} grant application and management`
     );
-    if (course.success && course.data) {
+    if (course.success && hasData(course) && course.data) {
       project.classroomCourseId = course.data.id;
     }
 
@@ -85,7 +94,7 @@ class NonprofitIntegrationService {
         }
       );
       
-      if (!trelloUpdate.success) {
+      if (!trelloUpdate.success && hasError(trelloUpdate)) {
         console.warn('Failed to update Trello board:', trelloUpdate.error);
       }
     }
@@ -99,7 +108,7 @@ class NonprofitIntegrationService {
         notes || 'Status updated by AI Grant Expert'
       );
       
-      if (!classroomUpdate.success) {
+      if (!classroomUpdate.success && hasError(classroomUpdate)) {
         console.warn('Failed to post classroom announcement:', classroomUpdate.error);
       }
     }
@@ -136,7 +145,7 @@ class NonprofitIntegrationService {
       }
     );
 
-    if (card.success && card.data) {
+    if (card.success && hasData(card) && card.data) {
       campaign.trelloCardId = card.data.id;
     }
 
