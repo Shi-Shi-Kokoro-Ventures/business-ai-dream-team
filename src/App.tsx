@@ -11,6 +11,9 @@ import NotFound from "./pages/NotFound";
 import { AgentContacts } from "./pages/AgentContacts";
 import AITest from "./pages/AITest";
 import SystemConfig from "./pages/SystemConfig";
+import Analytics from "./pages/Analytics";
+import AgentNetwork from "./pages/AgentNetwork";
+import Workflows from "./pages/Workflows";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -43,6 +46,9 @@ const App = () => (
               <Route path="/agent-contacts" element={<AgentContacts />} />
               <Route path="/ai-test" element={<AITest />} />
               <Route path="/system-config" element={<SystemConfig />} />
+              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/agent-network" element={<AgentNetwork />} />
+              <Route path="/workflows" element={<Workflows />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </MainLayout>
