@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { MainLayout } from '@/components/MainLayout';
 import EnhancedAgentCard from '@/components/EnhancedAgentCard';
 import EnterpriseMetrics from '@/components/EnterpriseMetrics';
 import AICapabilitiesShowcase from '@/components/AICapabilitiesShowcase';
@@ -75,7 +74,7 @@ const Index = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setConnectedAgents(prev => prev + Math.floor(Math.random() * 3) - 1);
+      setConnectedAgents(prev => Math.min(18, Math.max(15, prev + Math.floor(Math.random() * 3) - 1)));
     }, 5000);
 
     return () => clearInterval(interval);
@@ -249,25 +248,23 @@ const Index = () => {
   // Render different views based on currentView state
   if (currentView === 'executive') {
     return (
-      <MainLayout>
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-          <div className="container mx-auto px-6 py-8">
-            <div className="flex items-center gap-4 mb-6">
-              <Button onClick={handleBackToDashboard} variant="outline" size="sm">
-                ← Back to Dashboard
-              </Button>
-              <div className="flex items-center gap-3">
-                <Crown className="w-8 h-8 text-purple-600" />
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Executive Command Center</h1>
-                  <p className="text-gray-600">Real-time business intelligence and AI oversight</p>
-                </div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <div className="container mx-auto px-6 py-8">
+          <div className="flex items-center gap-4 mb-6">
+            <Button onClick={handleBackToDashboard} variant="outline" size="sm">
+              ← Back to Dashboard
+            </Button>
+            <div className="flex items-center gap-3">
+              <Crown className="w-8 h-8 text-purple-600" />
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Executive Command Center</h1>
+                <p className="text-gray-600 dark:text-gray-400">Real-time business intelligence and AI oversight</p>
               </div>
             </div>
-            <ExecutiveDashboard />
           </div>
+          <ExecutiveDashboard />
         </div>
-      </MainLayout>
+      </div>
     );
   }
 
@@ -276,10 +273,9 @@ const Index = () => {
   }
 
   return (
-    <MainLayout>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <div className="relative overflow-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%239C92AC\" fill-opacity=\"0.1\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"2\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
+          <div className="absolute inset-0 opacity-20" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"}}></div>
           
           <div className="relative container mx-auto px-6 py-20">
             <div className="text-center text-white">
@@ -447,7 +443,6 @@ const Index = () => {
           </Tabs>
         </div>
       </div>
-    </MainLayout>
   );
 };
 

@@ -1,6 +1,7 @@
 import { Agent, AgentMessage, AutonomousTask } from '@/types/agent';
 import { aiService } from './aiService';
 import { supabase } from '@/integrations/supabase/client';
+import { permissionService as permSvc } from './permissionService';
 
 interface AdvancedCapabilities {
   naturalLanguageProcessing: boolean;
@@ -294,7 +295,7 @@ class AgentCommunicationService {
       return data;
     } catch (error) {
       console.error('Failed to generate code:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
   }
 
@@ -526,9 +527,7 @@ class AgentCommunicationService {
   }
 
   private requiresExecutivePermission(action: string, agentId: string, metadata?: any): boolean {
-    // Import permission service dynamically to avoid circular dependencies
-    const { permissionService } = require('./permissionService');
-    return permissionService.requiresPermission(action, agentId, metadata);
+    return permSvc.requiresPermission(action, agentId, metadata);
   }
 
   private requestPermissionAndQueue(
@@ -539,7 +538,7 @@ class AgentCommunicationService {
     priority: 'low' | 'medium' | 'high' | 'critical',
     queuedAction: any
   ): PendingResponse {
-    const { permissionService } = require('./permissionService');
+    const permissionService = permSvc;
     const agentName = this.getAgentDisplayName(agentId);
     
     const request = permissionService.requestPermission(
