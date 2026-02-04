@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import EnhancedAgentCard from '@/components/EnhancedAgentCard';
 import EnterpriseMetrics from '@/components/EnterpriseMetrics';
 import AICapabilitiesShowcase from '@/components/AICapabilitiesShowcase';
@@ -245,6 +245,27 @@ const Index = () => {
     }
   ];
 
+  // Generate stable task counts per agent (not random on every render)
+  const agentTaskCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    agents.forEach((agent, i) => {
+      counts[agent.id] = 20 + ((i * 37 + 13) % 80); // deterministic pseudo-random
+    });
+    return counts;
+  }, []);
+
+  // Listen for view-change events from sidebar quick actions
+  useEffect(() => {
+    const handleViewChange = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.view === 'executive') {
+        setCurrentView('executive');
+      }
+    };
+    window.addEventListener('view-change', handleViewChange);
+    return () => window.removeEventListener('view-change', handleViewChange);
+  }, []);
+
   // Render different views based on currentView state
   if (currentView === 'executive') {
     return (
@@ -325,7 +346,7 @@ const Index = () => {
 
         <div className="container mx-auto px-6 py-12">
           <Tabs defaultValue="agents" className="space-y-8">
-            <TabsList className="grid w-full grid-cols-4 bg-white/80 backdrop-blur-sm border border-white/20 shadow-lg rounded-2xl p-2">
+            <TabsList className="grid w-full grid-cols-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/20 dark:border-gray-700/50 shadow-lg rounded-2xl p-2">
               <TabsTrigger value="agents" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-xl py-3 font-semibold transition-all duration-300">
                 AI Agents
               </TabsTrigger>
@@ -342,8 +363,8 @@ const Index = () => {
 
             <TabsContent value="agents" className="space-y-8">
               <div className="text-center mb-12">
-                <h2 className="text-4xl font-bold text-gray-900 mb-4">Meet Your AI Business Team</h2>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Meet Your AI Business Team</h2>
+                <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
                   18 specialized AI agents, each with unique expertise and autonomous capabilities, working together to revolutionize your business operations
                 </p>
               </div>
@@ -361,7 +382,7 @@ const Index = () => {
                     onClick={() => handleAgentClick(agent.id)}
                     responseTime="< 2s"
                     lastActivity="1 min ago"
-                    tasksCompleted={Math.floor(Math.random() * 100) + 20}
+                    tasksCompleted={agentTaskCounts[agent.id] || 42}
                   />
                 ))}
               </div>
@@ -378,17 +399,17 @@ const Index = () => {
             <TabsContent value="sms">
               <div className="space-y-8">
                 <div className="text-center mb-12">
-                  <h2 className="text-4xl font-bold text-gray-900 mb-4">SMS Agent Communication</h2>
-                  <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                  <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">SMS Agent Communication</h2>
+                  <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
                     Text your AI agents directly from your phone. Get instant responses and trigger complex business workflows via SMS.
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <Card className="p-8 bg-gradient-to-br from-green-50 to-emerald-50 border-0 shadow-xl">
+                  <Card className="p-8 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-0 shadow-xl">
                     <div className="flex items-center gap-3 mb-6">
-                      <Phone className="w-8 h-8 text-green-600" />
-                      <h3 className="text-2xl font-bold text-gray-900">How to Use SMS Agents</h3>
+                      <Phone className="w-8 h-8 text-green-600 dark:text-green-400" />
+                      <h3 className="text-2xl font-bold text-gray-900 dark:text-white">How to Use SMS Agents</h3>
                     </div>
                     <div className="space-y-4">
                       <div className="flex items-start gap-3">
@@ -415,10 +436,10 @@ const Index = () => {
                     </div>
                   </Card>
 
-                  <Card className="p-8 bg-gradient-to-br from-blue-50 to-indigo-50 border-0 shadow-xl">
+                  <Card className="p-8 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-0 shadow-xl">
                     <div className="flex items-center gap-3 mb-6">
-                      <MessageSquare className="w-8 h-8 text-blue-600" />
-                      <h3 className="text-2xl font-bold text-gray-900">Example Commands</h3>
+                      <MessageSquare className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                      <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Example Commands</h3>
                     </div>
                     <div className="space-y-4 text-sm">
                       <div className="p-3 bg-white rounded-lg border border-blue-200">
